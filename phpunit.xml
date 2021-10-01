@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+    <!-- ... -->
+
+    <testsuites>
+
+        <!-- ... -->
+
+        <testsuite name="Panic">
+            <directory suffix="Test.php">./vendor/Codificar/Panic</directory>
+        </testsuite>
+    </testsuites>
