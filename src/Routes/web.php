@@ -1,5 +1,9 @@
 <?php
 
-Route::get('panic', function () {
-    return 'contact';
+
+
+Route::group(['prefix' => '/lib/panic'], function () {
+    Route::get('/', function () {
+        return 'contact';
+    });
 });

@@ -4,7 +4,7 @@ namespace Codificar\Panic\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class PanicResource extends JsonResource
+class PanicSuccessfulResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -14,6 +14,9 @@ class PanicResource extends JsonResource
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+        return [
+            'success' => true,
+            'id' => $this->id,
+        ];
     }
 }

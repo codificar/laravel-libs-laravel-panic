@@ -8,6 +8,8 @@
             "email": "libs@codificar.com.br"
         }
     ],
+    "prefer-stable": true,
+    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "Codificar\\Panic\\": "src/",
@@ -20,9 +22,9 @@
         }
     },
     "require": {
-        "guzzlehttp/guzzle": "^7.0"
+        "guzzlehttp/guzzle": "~6.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^8.5"
+        "phpunit/phpunit": "^7.0"
     }
 }

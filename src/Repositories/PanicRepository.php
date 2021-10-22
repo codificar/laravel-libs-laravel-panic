@@ -2,36 +2,110 @@
 
 namespace Codificar\Panic\Repositories;
 
+use Illuminate\Support\Carbon;
 use Settings;
 use User;
-use Requests;
-use Provider;
 use Admin;
+use Ledger;
 use LedgerContact;
+use Provider;
+use RequestLocation;
+use stdClass;
+use Codificar\Panic\Models\Panic;
+
 
 class PanicRepository
 {
+    /**
+     * This function inserts the Panic Request on to the Panic table
+     * @param int $requestId
+     * @param int $ledgerId
+     * @param int $adminId
+     * @param object $fetchedData
+     * @return object $insertedEntry
+     */
+    // change this function to the repository pattern
+    public static function insertPanicRequestToTable($requestId, $ledgerId, $adminId,  $fetchedData)
+    {
+        $insertedEntry = new stdClass();
+
+        try {
+            $requestHistory = PanicRepository::createPanicHistory($fetchedData->userData, $fetchedData->providerData, $fetchedData->requestData, $requestId);
+            $panic = new Panic();
+            $panic->ledger_id = $ledgerId;
+            $panic->request_id = $requestId;
+            $panic->admin_id = $adminId;
+            $panic->history = $requestHistory;
+            $panic->save();
+            $insertedEntry = $panic;
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+        }
+
+        return $insertedEntry;
+    }
+
+    /**
+     * This function deletes a record from the panic table
+     * @param int $ledgerId
+     * @return string 
+     */
+    public function deletePanicRecordsFromTable(int $ledgerId)
+    {
+        $stringToReturn = "";
+        try {
+            Panic::where('ledger_id', $ledgerId)->delete();
+            $stringToReturn = trans('panic.successful_delete');
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+        }
+        return $stringToReturn;
+    }
+
     /**
      * This function provides a way to get the request location and data from the DB.
      * @param int $requestId
      * @return object $requestData
      */
-    public static function getRequestData($requestId)
+    public static function getRequestLocationData(int $requestId)
     {
-        $requestData =
-            Requests::find($requestId)->join('request_location', $requestId, '=', 'request_location.request_id')
-            ->select(
-                'requests.user_id',
-                'requests.provider_id',
-                'request_location.updated_at',
-                'request_location.latitude',
-                'request_location.longitude',
-                'request_location.speed',
-                'request_location.bearing'
-            );
+        $requestLocationData = new stdClass();
+        try {
+            $requestLocationData =
+                RequestLocation::where('id', $requestId)->firstOrFail([
+                    'updated_at',
+                    'latitude',
+                    'longitude',
+                    'speed',
+                    'bearing'
+                ]);
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+        }
 
-        return $requestData;
+        return $requestLocationData;
     }
+    /**
+     * This function provides a way to get the user and provider data from the DB using the Ledger Id.
+     * @param int $ledgerId
+     * @return object $partiesData
+     */
+    public static function getPartiesData($ledgerId)
+    {
+        $partiesData = new stdClass();
+        try {
+            $partiesData = Ledger::where('id', $ledgerId)->first([
+                'user_id',
+                'provider_id'
+            ]);
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+        };
+
+        return $partiesData;
+    }
+
+
 
     /**
      * This function provides a way to get the user data From The DB
@@ -40,12 +114,15 @@ class PanicRepository
      */
     public static function getUserData($userId)
     {
-        $userData = User::find($userId)->select(
-            'first_name',
-            'last_name',
-            'ledger_id'
-        );
-
+        $userData = new stdClass();
+        try {
+            $userData = User::where('id', $userId)->firstOrFail([
+                'first_name',
+                'last_name'
+            ]);
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+        }
         return $userData;
     }
 
@@ -56,8 +133,9 @@ class PanicRepository
      */
     public static function getProviderData($providerId)
     {
-        $providerData = Provider::find($providerId)
-            ->select(
+        $providerData = new stdClass();
+        try {
+            $providerData = Provider::where('id', $providerId)->firstOrFail([
                 'first_name',
                 'last_name',
                 'document',
@@ -65,24 +143,28 @@ class PanicRepository
                 'car_model',
                 'car_color',
                 'car_number'
-            );
-
+            ]);
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+        }
         return $providerData;
     }
 
     /**
-     * This function provides a way to get the emergency contacts to send the messages from the DB.
+     * This function provides a way to compare the  emergency ledger contacts that are also users and get their id.
      * @param int $ledgerId
-     * @return object $emergencyContacts 
+     * @return object $ledgerContactUsers
      */
-    public static function getEmergencyContacts($ledgerId)
+    public static function getEmergencyContactsUserId($ledgerId)
     {
-        if (LedgerContact::findById($ledgerId) != null) {
-            $emergencyContacts = LedgerContact::find($ledgerId)->select(['email', 'phone']);
-            return $emergencyContacts;
-        } else {
-            return $emergencyContacts = null;
+        $ledgerContactsUsers = new stdClass();
+        try {
+            $ledgerContactsUsers =  LedgerContact::where('ledger_id', $ledgerId)
+                ->join('user', 'ledger_contact.email', '=', 'user.email')->get(['user.id']);
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
         }
+        return $ledgerContactsUsers;
     }
 
     /**
@@ -92,15 +174,224 @@ class PanicRepository
      */
     public static function getAdminData()
     {
-        $adminMail = Settings::getAdminEmail();
-        $adminPhone = Settings::getAdminPhone();
-        $adminId = Admin::find(Auth::guard('web')->user()->id);
+        try {
+            $adminMail = Settings::getAdminEmail();
+            $adminPhone = Settings::getAdminPhone();
+            $adminId = Admin::where('username', $adminMail)->first(['id']);
+            $adminData = (object) array(
+                'adminPhone' => $adminPhone,
+                'adminMail' => $adminMail,
+                'adminId' => $adminId->id
+            );
+            return $adminData;
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+        };
+    }
 
-        $adminData = (object)[
-            $adminPhone,
-            $adminMail,
-            $adminId
-        ];
-        return $adminData;
+
+    /**
+     * This function fetches the panic User Button Setting from the DB.
+     * @param null
+     * @return object $panicUserButtonSetting
+     */
+    public static function getPanicUserButtonSetting()
+    {
+        try {
+            $panicButtonUserSettings = Settings::getPanicButtonEnabledUser();
+            return (object) array(
+                'panic_button_enabled_user' => $panicButtonUserSettings
+            );
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+        };
+    }
+
+
+    /**
+     * This function saves the panic User Button Setting in the DB.
+     * @param string $setting
+     * @return object $panicProviderButtonSetting
+     */
+    public static function setPanicUserButtonSetting(string $setting)
+    {
+        try {
+            $panicButtonUserSettings = Settings::savePanicButtonEnabledUser($setting);
+            return $panicButtonUserSettings;
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+        };
+    }
+
+    /**
+     * This function fetches the panic Provider Button Setting from the DB.
+     * @param null
+     * @return object $panicProviderButtonSetting
+     */
+    public static function getPanicProviderButtonSetting()
+    {
+        try {
+            $panicButtonProviderSetting = Settings::getPanicButtonEnabledProvider();
+            return (object) array(
+                'panic_button_enabled_provider' => $panicButtonProviderSetting
+            );
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+        };
+    }
+
+    /**
+     * This function saves the panic User Button Setting in the DB.
+     * @param string $setting
+     * @return object $panicProviderButtonSetting
+     */
+    public static function setPanicProviderButtonSetting(string $setting)
+    {
+        try {
+            $panicButtonUserSettings = Settings::savePanicButtonEnabledProvider($setting);
+            return $panicButtonUserSettings;
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+        };
+        //https: //app.mobi66.appmobilidadeurbana.com.br/api/v3/application/settings?user_type=user
+    }
+
+
+    /**
+     * This function creates the panic history string to be uploaded to the panic table
+     * @param object $userData
+     * @param object $providerData
+     * @param object $requestData
+     * @param int $requestId
+     * @return string $panicHistory
+     */
+    public static function createPanicHistory(object $userData, object $providerData, object $requestData, int $requestId)
+    {
+        if (get_object_vars($userData)  && get_object_vars($providerData)  && get_object_vars($requestData)) {
+
+            $panicHistory = trans('panic::panic.user') . $userData->first_name . " " . $userData->last_name . trans('panic::panic.id') . $requestId . trans('panic::panic.emergency_alert') .
+                $providerData->first_name . " " . $providerData->last_name . trans('panic::panic.id') . $requestId . trans('panic::panic.document')
+                . $providerData->document . trans('panic::panic.vehicle')
+                . $providerData->car_brand . " " . $providerData->car_model . " " . $providerData->car_color . " " . $providerData->car_number;
+            return $panicHistory;
+        } else return $panicHistory = trans('panic::panic.panic_push_title');
+    }
+
+    /**
+     * This function fetches the needed data for the panic requests
+     * @param int $requestId
+     * @param int $ledgerId
+     * @return object $fetchedPanicData
+     */
+    public static function getPanicData(int $requestId, int $ledgerId)
+    {
+        $partiesData = PanicRepository::getPartiesData($ledgerId);
+
+        if ($partiesData != null && $partiesData->user_id != null && $partiesData->provider_id != null) {
+            $requestData = PanicRepository::getRequestLocationData($requestId);
+            $userData = PanicRepository::getUserData($partiesData->user_id);
+            $providerData = PanicRepository::getProviderData($partiesData->provider_id);
+            $adminData = PanicRepository::getAdminData();
+
+            $fetchedPanicData = (object) array(
+                'userData' => $userData,
+                'providerData' => $providerData,
+                'requestData' => $requestData,
+                'adminData' => $adminData
+            );
+
+            return $fetchedPanicData;
+        }
+    }
+    /**
+     * This function creates the panic request body in the JSON format required by the segup api
+     * @param object $providerData
+     * @param object $requestData
+     * @return array $panicRequestBody
+     */
+    public static function createSegupRequestBody(object $providerData, object $requestData)
+    {
+        try {
+            if ($requestData->bearing <= 0.0 || $requestData->bearing >= 360) {
+                $direction = 'N';
+            } else $direction = getDirection($requestData->bearing);
+
+            $panicUpdatedAt = Carbon::parse($requestData->updated_at)->toDateTimeString();
+
+            $segupRequestBody = [
+                "iddispositivo" => $providerData->document,
+                "identificacao" => $providerData->first_name . " " . $providerData->last_name . " " . $providerData->car_brand . " " . $providerData->car_model . " " . $providerData->car_color . "" . $providerData->car_number,
+                "dt_posicao" => $panicUpdatedAt,
+                "latitude" => $requestData->latitude,
+                "longitude" => $requestData->longitude,
+                "velocidade" => $requestData->speed,
+                "direcao" => $direction,
+                "situacao" => "PANICO"
+            ];
+            return $segupRequestBody;
+        } catch (\Exception $e) {
+            return \Log::error($e->getMessage());;
+        }
+    }
+
+    /**
+     * This function checks if the admin is using a Security Provider Agency, if so, the value is passed upon validation of the request;
+     * @return string $security_agency || null
+     */
+    public static function getDirectedToSegup()
+    {
+        $securityAgency = Settings::getSecurityProviderAgency();
+        if ($securityAgency = "segup") {
+            return $securityAgency;
+        } else return trans('panic::panic.no_security_agency');
+    }
+
+    /**
+     * This function sets an admin phone on the Settings Table using the Facade brought by laravel after a Route call
+     * and then returns the phone number 
+     * @param string $adminPhone
+     * @return string $adminPhone
+     */
+    public static function setAdminPhoneForEmergencies(string $adminPhone)
+    {
+
+        try {
+            $adminPhone = Settings::saveAdminPhoneForAlert($adminPhone);
+            return trans('panic.admin_phone_saved') . $adminPhone;
+        } catch (\Exception $e) {
+            return $e . trans('panic::panic.admin_phone_not_saved');
+        }
+        https: //app.mobi66.appmobilidadeurbana.com.br/api/v3/application/settings?user_type=user
+    }
+
+    /**
+     * This function converts a bearing received from the DB to a cardinal direction
+     * BROKEN FUNCTION IN THE HELPER
+     * @param float $bearing
+     * @return string $direction
+     */
+    public static function getDirectionFromBearing(float $bearing)
+    {
+        if ($bearing > 337.5 && $bearing < 360 || $bearing < 0 && $bearing > 22.5) {
+            return "N";
+        }
+
+        $cardinalDirections = array(
+            'N' => array(337.5, 22.5),
+            'NE' => array(22.5, 67.5),
+            'L' => array(67.5, 112.5),
+            'SE' => array(112.5, 157.5),
+            'S' => array(157.5, 202.5),
+            'SO' => array(202.5, 247.5),
+            'O' => array(247.5, 292.5),
+            'NO' => array(292.5, 337.5)
+        );
+
+        foreach ($cardinalDirections as $dir => $angles) {
+            if ($bearing >= $angles[0] && $bearing < $angles[1]) {
+                $direction = $dir;
+                return $direction;
+            }
+        }
     }
 };

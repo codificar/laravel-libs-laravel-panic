@@ -6,7 +6,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class PanicStoreRequest extends FormRequest
+class PanicSettingStoreRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,17 +26,16 @@ class PanicStoreRequest extends FormRequest
     public function rules()
     {
         return [
-            'ledger_id' => 'required|integer',
-            'request_id' => 'required|integer',
-            'security_agency' => 'nullable|string',
+            'panic_button_enabled_user' => 'required|string',
+            'panic_button_enabled_provider' => 'required|string',
         ];
     }
 
     public function messages()
     {
         return [
-            'ledger_id' => 'ledger_id is required and must be an integer',
-            'request_id' => 'request_id is required and must be an integer'
+            'panic_button_enabled_user' => 'panic_button_enabled_user is required and must be a string containing a boolean',
+            'panic_button_enabled_provider' => 'panic_button_enabled_provider is required and must be a string containing a boolean'
         ];
     }
     /**

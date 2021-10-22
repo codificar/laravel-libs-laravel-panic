@@ -15,9 +15,12 @@ class CreatePanicTable extends Migration
     {
         Schema::create('panic', function (Blueprint $table) {
             $table->increments('id');
+            $table->unsignedInteger('ledger_id');
             $table->foreign('ledger_id')->references('id')->on('ledger');
-            $table->foreign('request_id')->references('id')->on('request')->nullable($value = true);
-            $table->foreign('admin_id')->references('id')->on('admin')->nullable($value = true);
+            $table->unsignedInteger('request_id')->nullable($value = true);
+            $table->foreign('request_id')->references('id')->on('request');
+            $table->unsignedInteger('admin_id')->nullable($value = true);
+            $table->foreign('admin_id')->references('id')->on('admin');
             $table->text('history')->nullable();
             $table->timestamps();
         });
