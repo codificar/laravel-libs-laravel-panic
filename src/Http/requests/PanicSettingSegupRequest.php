@@ -6,7 +6,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class PanicSettingStoreRequest extends FormRequest
+class PanicSettingSegupRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,16 +26,22 @@ class PanicSettingStoreRequest extends FormRequest
     public function rules()
     {
         return [
-            'panic_button_enabled_user' => 'required|string',
-            'panic_button_enabled_provider' => 'required|string',
+            'security_provider_agency' => 'required|string',
+            'segup_login' => 'required|string',
+            'segup_password' => 'required|string',
+            'segup_request_url' => 'required|string',
+            'segup_verification_url' => 'required|string',
         ];
     }
 
     public function messages()
     {
         return [
-            'panic_button_enabled_user' => 'panic_button_enabled_user is required and must be a string containing a boolean',
-            'panic_button_enabled_provider' => 'panic_button_enabled_provider is required and must be a string containing a boolean',
+            'security_provider_agency' =>  'security_provider_agency is required and must be a string ',
+            'segup_login' => 'segup_login is required and must be a string ',
+            'segup_password' => ' segup_password is required and must be a string ',
+            'segup_request_url' => 'segup_request_url is required and must be a string ',
+            'segup_verification_url' => 'segup_verification_url is required and must be a string ',
         ];
     }
     /**

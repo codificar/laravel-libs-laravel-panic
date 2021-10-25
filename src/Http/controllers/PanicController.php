@@ -3,16 +3,18 @@
 namespace Codificar\Panic\Http;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use Codificar\Panic\Http\Resources\PanicDeletedResource;
 use Codificar\Panic\Http\Resources\PanicSuccessfulResource;
 use Codificar\Panic\Http\Resources\PanicOnlyCreatedResource;
 use Settings;
 use Carbon\Carbon;
 use Codificar\Panic\Http\Requests\PanicSettingStoreRequest;
+use Codificar\Panic\Http\Requests\PanicSettingSegupRequest;
 use Codificar\Panic\Http\Requests\PanicStoreRequest;
 use Codificar\Panic\Http\Resources\PanicButtonGettingResource;
 use Codificar\Panic\Http\Resources\PanicButtonSettingResource;
+use Codificar\Panic\Http\Resources\PanicGettingSegupResource;
+use Codificar\Panic\Http\Resources\PanicSettingSegupResource;
 use Codificar\Panic\Repositories\PanicRepository;
 
 class PanicController extends Controller
@@ -20,9 +22,11 @@ class PanicController extends Controller
     /**
      * This store function will deal with preparing the information and passing it to the respective functions that are needed.
      * @api {post} /lib/panic/store 
-     * @param object $request
+     * @param object $request->ledger_id
+     * @param object $request->request_id
      * @return resource PanicResource
      */
+    //TODO: include the type param into the req to differentiate the types of alert, then create one type of histories for each type of alert
     public function storePanicRequest(PanicStoreRequest $request)
     {
         $requestId = $request->request_id;
@@ -37,7 +41,7 @@ class PanicController extends Controller
             $this->sendSmsForEmergencyContacts($ledgerId);
             $this->sendPushToEmergencyContacts($ledgerId);
         }
-        $security_agency = PanicRepository::getDirectedToSegup();
+        $security_agency = PanicRepository::getSecurityProviderAgency();
         //to include other api calls to third party security agencies include it into the if block below
         //you need to create the functions that will call that 3rd party api then include the resource in the next 
         if ($security_agency == 'segup') {
@@ -50,6 +54,7 @@ class PanicController extends Controller
         }
     }
     /**
+     * @apí {post} /lib/panic/delete
      * @param int $request->ledger_id;
      * @return resource PanicDeletedResource
      */
@@ -64,11 +69,12 @@ class PanicController extends Controller
 
     /**
      * This function will save the panic button settings on the database
+     * @api {post} /lib/panic/setting
      * @param object $request->panic_button_enabled_user
      * @param object $request->panic_button_enabled_provider
      * @return resource PanicButtonSettingResource
      */
-    public function savePanicSettings(PanicSettingStoreRequest $request)
+    public function savePanicButtonSettings(PanicSettingStoreRequest $request)
     {
         $panicButtonUserSetting = $request->panic_button_enabled_user;
         $panicButtonProviderSetting = $request->panic_button_enabled_provider;
@@ -91,10 +97,50 @@ class PanicController extends Controller
     }
 
     /**
+     * This function will save the provided fields in the setttings table to provide the data needed for the api to work
+     * @api {get}/lib/panic/settings/segup
+     * @param object $request->security_provider_agency
+     * @param object $request->segup_login
+     * @param object $request->segup_password
+     * @param object $request->segup_request_url
+     * @param object $request->segup_response_url
+     * @return resource PanicSettingSegupResource
+     */
+    public function savePanicSegupSettings(PanicSettingSegupRequest $request)
+    {
+        $panicSecurityProviderAgency = $request->security_provider_agency;
+        $panicSegupLogin = $request->segup_login;
+        $panicSegupPassword = $request->segup_password;
+        $panicSegupRequestUrl = $request->segup_request_url;
+        $panicSegupVerificationUrl = $request->segup_verification_url;
+
+        if ($panicSecurityProviderAgency == 'segup') {
+            $securityProviderAgency = PanicRepository::setSecurityProviderAgency($panicSecurityProviderAgency);
+            $segupLogin = PanicRepository::setSegupLogin($panicSegupLogin);
+            $segupPassword = PanicRepository::setSegupPassword($panicSegupPassword);
+            $segupRequestUrl = PanicRepository::setSegupRequestUrl($panicSegupRequestUrl);
+            $segupVerificationUrl = PanicRepository::setSegupVerificationUrl($panicSegupVerificationUrl);
+
+            $panicSegupSettings = (object) array(
+                'security_provider_agency' => $securityProviderAgency,
+                'segup_login' => $segupLogin,
+                'segup_password' => $segupPassword,
+                'segup_request_url' => $segupRequestUrl,
+                'segup_verification_url' => $segupVerificationUrl
+            );
+            return new PanicSettingSegupResource($panicSegupSettings);
+        } elseif (get_object_vars($request) == null) {
+            $failedRequest = false;
+            return new PanicSettingSegupResource($failedRequest);
+        }
+    }
+
+    /**
      * This function will return the panic button settings that are needed from the database
+     * @api {get}/lib/panic/settings/
      * @return resource PanicButtonGettingResource
      */
-    public function getPanicSettings()
+    public static function getPanicButtonSettings()
     {
         $panicButtonUserSetting = PanicRepository::getPanicUserButtonSetting();
         $panicButtonProviderSetting = PanicRepository::getPanicProviderButtonSetting();
@@ -103,6 +149,28 @@ class PanicController extends Controller
             'panic_button_enabled_provider' => $panicButtonProviderSetting,
         );
         return new PanicButtonGettingResource($panicRepositorySettings);
+    }
+
+    /**
+     * This function will return the panic segup settings that are needed from the database
+     * @api {get}/lib/panic/settings/segup
+     * @return resource PanicSettingSegupResource
+     */
+    public static function getPanicSegupSettings()
+    {
+        $panicSegupLogin = PanicRepository::getSegupLogin();
+        $panicSegupPassword = PanicRepository::getSegupPassword();
+        $panicSegupRequestUrl = PanicRepository::getSegupRequestUrl();
+        $panicSegupVerificationUrl = PanicRepository::getSegupVerificationUrl();
+        $panicSecurityProviderAgency = PanicRepository::getSecurityProviderAgency();
+        $panicRepositorySettings = (object) array(
+            'segup_login' => $panicSegupLogin,
+            'segup_password' => $panicSegupPassword,
+            'segup_request_url' => $panicSegupRequestUrl,
+            'segup_verification_url' => $panicSegupVerificationUrl,
+            'security_provider_agency' => $panicSecurityProviderAgency
+        );
+        return new PanicGettingSegupResource($panicRepositorySettings);
     }
 
     /**
@@ -209,22 +277,40 @@ class PanicController extends Controller
     public static function verifySegupToken()
     {
         $timestamp = Settings::getSegupTokenExpirationTimestamp();
-        if ($timestamp != 'No Timestamp' && $timestamp != Carbon::today()) {
+        if ($timestamp = 'No Timestamp' || $timestamp != Carbon::today()) {
             $url = Settings::getSegupVerificationUrl();
             $login = Settings::getSegupLogin();
             $password = Settings::getSegupPassword();
-            $client = new \GuzzleHttp\Client();
-            $response = $client->post($url, [
-                'form_params' => [
-                    'login' => $login,
-                    'password' => $password,
-                    'no-g-recaptcha' => true,
-                    'expire' => 1440
-                ]
-            ]);
-            $token = json_decode($response->getBody());
+            $encodedRequestBody = [
+                'login' => $login,
+                'password' => $password,
+                'no-g-recaptcha' => true,
+                'expire' => 1000
+            ];
+            $postFieldsUnencoded = http_build_query($encodedRequestBody);
+
+            $curl = curl_init();
+
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => $url,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => $postFieldsUnencoded,
+                CURLOPT_HTTPHEADER => array(
+                    'Content-Type: application/x-www-form-urlencoded'
+                ),
+            ));
+
+            $response = curl_exec($curl);
+            $decodedResponse = json_decode($response);
+            curl_close($curl);
             $timestamp = Settings::saveSegupTokenExpirationTimestamp();
-            $savedToken = Settings::saveSegupToken($token->token);
+            $savedToken = Settings::saveSegupToken($decodedResponse->token);
             return $savedToken->value;
         } else {
             $savedToken = Settings::getSegupToken();
@@ -256,16 +342,15 @@ class PanicController extends Controller
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'POST',
-            //finish preparing the fields
             CURLOPT_POSTFIELDS => $unencodedRequestBody,
             CURLOPT_HTTPHEADER => array(
                 'Authorization: Bearer ' . $token,
                 'Content-Type: application/x-www-form-urlencoded'
             ),
         ));
-        $response = json_decode(curl_exec($curl));
+        $response = curl_exec($curl);
+        $decodedResponse = json_decode($response);
         curl_close($curl);
-
-        return $response;
+        return $decodedResponse;
     }
 }

@@ -17,4 +17,9 @@ return array(
     'request_request_id_error' => 'request_id is required and must be an integer',
     'push_request_error' => 'A requisição de Push disparou uma exceção, favor verificar os parâmetros enviados',
     'push_was_successful' => 'A requisição de push foi bem sucedida',
+    'save_segup_setting_was_not_successful' => 'A requisição para salvar os settings da SEGUP não foi bem sucedida',
+    'no_segup_login' => 'Não há login da SEGUP registrado no banco de dados',
+    'no_segup_password' => 'Não há senha da SEGUP registrada no banco de dados',
+    'no_segup_url' => 'Não há url da SEGUP registrada no banco de dados',
+    'no_segup_verification_url' => 'Não há url de verificação de token da SEGUP registrada no banco de dados',
 );

@@ -17,4 +17,9 @@ return array(
     'request_request_id_error' => 'request_id is required and must be an integer',
     'push_request_error' => 'The Push Request Had an Error, please verify the parameters passed',
     'push_was_successful' => 'The Push Request Was Successful',
+    'save_segup_setting_was_not_successful' => 'The Segup saving settings operation was not successful',
+    'no_segup_login' => 'No Segup Login in the Database',
+    'no_segup_password' => 'No Segup Password in the Database',
+    'no_segup_url' => 'No Segup Url in the Database',
+    'no_segup_verification_url' => 'No Segup verification url in the Database',
 );

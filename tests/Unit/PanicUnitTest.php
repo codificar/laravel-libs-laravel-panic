@@ -140,7 +140,7 @@ class PanicUnitTest extends TestCase
     //start of model unit tests
     public function testWillGetAllNeededPanicData()
     {
-        $repository = PanicRepository::getPanicData(1, 3);
+        $repository = PanicRepository::getPanicData(1989, 6);;
         $this->assertIsObject($repository);
         $this->objectHasAttribute('partiesData', $repository);
         $this->objectHasAttribute('userData', $repository);
@@ -162,7 +162,7 @@ class PanicUnitTest extends TestCase
     public function testWillCreatePanicHistory()
     {
         $ledgerId = 3;
-        $fetchedPanicData = PanicRepository::getPanicData(1, 3);
+        $fetchedPanicData = PanicRepository::getPanicData(1989, 6);
         $createdPanicHistory = PanicRepository::createPanicHistory(
             $fetchedPanicData->userData,
             $fetchedPanicData->providerData,
@@ -247,14 +247,15 @@ class PanicUnitTest extends TestCase
     {
         $setting = 'segup';
         $segupValue = Settings::saveSecurityProviderAgency($setting);
-        $segupRefreshing = PanicRepository::getDirectedToSegup();
+        $segupRefreshing = PanicRepository::getSecurityProviderAgency();
         $this->assertStringContainsString($segupRefreshing, "segup");
     }
+
 
     //TODO: MAKE TEST FOR NEGATIVE CASES
     public function testWillCreateSegupBodyForRequest()
     {
-        $fetchedPanicData = PanicRepository::getPanicData(1, 3);
+        $fetchedPanicData = PanicRepository::getPanicData(1989, 6);
         $createdSegupBody = PanicRepository::createSegupRequestBody(
             $fetchedPanicData->providerData,
             $fetchedPanicData->requestData
@@ -265,7 +266,7 @@ class PanicUnitTest extends TestCase
     public function testWillNotCreateSegupBodyForRequestOnlyOneFalseValue()
     {
         $empty = new stdClass();
-        $fetchedPanicData = PanicRepository::getPanicData(1, 3);
+        $fetchedPanicData = PanicRepository::getPanicData(1989, 6);
         $createdSegupBody = PanicRepository::createSegupRequestBody(
             $fetchedPanicData->providerData,
             $empty
@@ -279,9 +280,9 @@ class PanicUnitTest extends TestCase
     //TODO: NEED TO TEST MORE EDGE CASES TO BE SAFE
     public function testWillSendMailToAdmin()
     {
-        $adminId = 54;
-        $requestId = 1;
-        $fetchedData =  PanicRepository::getPanicData(1, 3);
+        $adminId = 1;
+        $requestId = 1989;
+        $fetchedData =  PanicRepository::getPanicData(1989, 6);
         $this->assertIsObject($fetchedData);
         $panicInstance = new PanicController();
         $panicMail = $panicInstance->sendMailForAdmin($adminId, $requestId, $fetchedData);
@@ -302,10 +303,10 @@ class PanicUnitTest extends TestCase
     //TODO: TEST USER WITH MULTIPLE LEDGER CONTACTS
     public function testWillSendMailToEmergencyContacts()
     {
-        $ledgerId = 3;
-        $requestId = 1;
+        $ledgerId = 6;
+        $requestId = 1989;
         $panicInstance = new PanicController();
-        $fetchedData =  PanicRepository::getPanicData(1, 3);
+        $fetchedData =  PanicRepository::getPanicData($requestId, $ledgerId);
         $this->assertIsObject($fetchedData);
         $panicSms = $panicInstance->sendMailForEmergencyContacts($ledgerId, $fetchedData, $requestId);
         $this->assertIsBool($panicSms);
@@ -314,19 +315,121 @@ class PanicUnitTest extends TestCase
 
     public function testWillSendSmsToEmergencyContacts()
     {
-        $ledgerId = 112;
+        $ledgerId = 6;
         $panicInstance = new PanicController();
         $panicSms = $panicInstance->sendSmsForEmergencyContacts($ledgerId);
         $this->assertIsBool($panicSms);
         $this->isTrue($panicSms);
     }
 
+
+
+    //TESTING SETTINGS MODEL
     public function testWillGetPanicButtonSettings()
     {
+        $controllerCall = PanicController::getPanicButtonSettings();
+        $this->assertIsObject($controllerCall);
+        $this->assertArrayHasKey('panic_button_enabled_user', $controllerCall);
+        $this->assertArrayHasKey('panic_button_enabled_provider', $controllerCall);
+    }
+
+    //testing login
+    public function testWillSaveSeguploginToDB()
+    {
+        $segupLogin = 'ramon@drivesocial.io';
+        $repositoryCall = PanicRepository::setSegupLogin($segupLogin);
+        $this->assertIsObject($repositoryCall);
+        $this->objectHasAttribute('segup_login', $repositoryCall);
+        $this->assertDatabaseHas('settings', ['key' => 'segup_login', 'value' => $segupLogin]);
+    }
+
+    public function testWillGetSegupLoginFromDB()
+    {
+        $segupLogin = 'ramon@drivesocial.io';
+        $repositoryCall = PanicRepository::getSegupLogin();
+        $this->assertStringContainsString($segupLogin, $repositoryCall);
+        $this->assertIsString($repositoryCall);
+    }
+
+
+
+    //testing password
+    public function testWillSaveSegupPasswordToDB()
+    {
+        $segupPassword = '1q2w3e4r5t6y';
+        $repositoryCall = PanicRepository::setSegupPassword($segupPassword);
+        $this->assertIsObject($repositoryCall);
+        $this->objectHasAttribute('segup_password', $repositoryCall);
+        $this->assertDatabaseHas('settings', ['key' => 'segup_password', 'value' => $segupPassword]);
+    }
+
+    public function testWillGetSegupPasswordFromDB()
+    {
+        $segupPassword = '1q2w3e4r5t6y';
+        $repositoryCall = PanicRepository::getSegupPassword($segupPassword);
+        $this->assertStringContainsString($segupPassword, $repositoryCall);
+        $this->assertIsString($repositoryCall);
+    }
+
+
+    //testing auth url 
+    public function testWillSaveSegupAuthUrlToDB()
+    {
+        $segupVerificationUrl = 'http://sistemas.segup.pa.gov.br/alerta/api/usuario/autenticar';
+        $repositoryCall = PanicRepository::setSegupVerificationUrl($segupVerificationUrl);
+        $this->assertIsObject($repositoryCall);
+        $this->objectHasAttribute('segup_verification_url', $repositoryCall);
+        $this->assertDatabaseHas('settings', ['key' => 'segup_verification_url', 'value' => $segupVerificationUrl]);
+    }
+
+    public function testWillGetSegupAuthUrlFromDB()
+    {
+        $segupVerificationUrl = 'http://sistemas.segup.pa.gov.br/alerta/api/usuario/autenticar';
+        $repositoryCall = PanicRepository::getSegupVerificationUrl($segupVerificationUrl);
+        $this->assertStringContainsString($segupVerificationUrl, $repositoryCall);
+        $this->assertIsString($repositoryCall);
+        $this->assertDatabaseHas('settings', ['key' => 'segup_verification_url', 'value' => $segupVerificationUrl]);
+    }
+
+
+    //testRequestUrl
+    public function testWillSaveSegupRequestUrlToDB()
+    {
+        $segupRequestUrl = "http://sistemas.segup.pa.gov.br/alerta/api/posicao";
+        $repositoryCall = PanicRepository::setSegupRequestUrl($segupRequestUrl);
+        $this->assertIsObject($repositoryCall);
+        $this->objectHasAttribute('segup_request_url', $repositoryCall);
+        $this->assertDatabaseHas('settings', ['key' => 'segup_request_url', 'value' => $segupRequestUrl]);
+    }
+
+    public function testWilGetSegupRequestUrlFromDB()
+    {
+        $segupRequestUrl = "http://sistemas.segup.pa.gov.br/alerta/api/posicao";
+        $repositoryCall = PanicRepository::getSegupRequestUrl($segupRequestUrl);
+        $this->assertIsString($repositoryCall);
+        $this->assertDatabaseHas('settings', ['key' => 'segup_request_url', 'value' => $segupRequestUrl]);
+    }
+
+
+    //test All Settings
+    public function testWillGetPanicSegupSettings()
+    {
+        $controllerCall = PanicController::getPanicSegupSettings();
+        $this->assertIsObject($controllerCall);
+        $this->assertArrayHasKey('segup_login', $controllerCall);
+    }
+
+    public function testWillVerifySegupToken()
+    {
+        $verifiedSegupToken = PanicController::verifySegupToken();
+        $this->assertIsString($verifiedSegupToken);
+    }
+
+    public function testWillCallSegupApi()
+    {
+        $fetchedData =  PanicRepository::getPanicData(1989, 6);
         $panicInstance = new PanicController();
-        $repository = $panicInstance->getPanicSettings();
-        $this->assertIsObject($repository);
-        $this->assertArrayHasKey('panic_button_enabled_user', $repository);
-        $this->assertArrayHasKey('panic_button_enabled_provider', $repository);
+        $segupResponse = $panicInstance->callSegupApi($fetchedData->providerData, $fetchedData->requestData);
+        $this->assertIsObject($segupResponse);
     }
 }

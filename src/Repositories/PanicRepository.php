@@ -177,7 +177,7 @@ class PanicRepository
         try {
             $adminMail = Settings::getAdminEmail();
             $adminPhone = Settings::getAdminPhone();
-            $adminId = Admin::where('username', $adminMail)->first(['id']);
+            $adminId = Admin::where('username', $adminMail)->firstOrFail(['id']);
             $adminData = (object) array(
                 'adminPhone' => $adminPhone,
                 'adminMail' => $adminMail,
@@ -188,74 +188,6 @@ class PanicRepository
             \Log::error($e->getMessage());
         };
     }
-
-
-    /**
-     * This function fetches the panic User Button Setting from the DB.
-     * @param null
-     * @return object $panicUserButtonSetting
-     */
-    public static function getPanicUserButtonSetting()
-    {
-        try {
-            $panicButtonUserSettings = Settings::getPanicButtonEnabledUser();
-            return (object) array(
-                'panic_button_enabled_user' => $panicButtonUserSettings
-            );
-        } catch (\Exception $e) {
-            \Log::error($e->getMessage());
-        };
-    }
-
-
-    /**
-     * This function saves the panic User Button Setting in the DB.
-     * @param string $setting
-     * @return object $panicProviderButtonSetting
-     */
-    public static function setPanicUserButtonSetting(string $setting)
-    {
-        try {
-            $panicButtonUserSettings = Settings::savePanicButtonEnabledUser($setting);
-            return $panicButtonUserSettings;
-        } catch (\Exception $e) {
-            \Log::error($e->getMessage());
-        };
-    }
-
-    /**
-     * This function fetches the panic Provider Button Setting from the DB.
-     * @param null
-     * @return object $panicProviderButtonSetting
-     */
-    public static function getPanicProviderButtonSetting()
-    {
-        try {
-            $panicButtonProviderSetting = Settings::getPanicButtonEnabledProvider();
-            return (object) array(
-                'panic_button_enabled_provider' => $panicButtonProviderSetting
-            );
-        } catch (\Exception $e) {
-            \Log::error($e->getMessage());
-        };
-    }
-
-    /**
-     * This function saves the panic User Button Setting in the DB.
-     * @param string $setting
-     * @return object $panicProviderButtonSetting
-     */
-    public static function setPanicProviderButtonSetting(string $setting)
-    {
-        try {
-            $panicButtonUserSettings = Settings::savePanicButtonEnabledProvider($setting);
-            return $panicButtonUserSettings;
-        } catch (\Exception $e) {
-            \Log::error($e->getMessage());
-        };
-        //https: //app.mobi66.appmobilidadeurbana.com.br/api/v3/application/settings?user_type=user
-    }
-
 
     /**
      * This function creates the panic history string to be uploaded to the panic table
@@ -334,35 +266,6 @@ class PanicRepository
         }
     }
 
-    /**
-     * This function checks if the admin is using a Security Provider Agency, if so, the value is passed upon validation of the request;
-     * @return string $security_agency || null
-     */
-    public static function getDirectedToSegup()
-    {
-        $securityAgency = Settings::getSecurityProviderAgency();
-        if ($securityAgency = "segup") {
-            return $securityAgency;
-        } else return trans('panic::panic.no_security_agency');
-    }
-
-    /**
-     * This function sets an admin phone on the Settings Table using the Facade brought by laravel after a Route call
-     * and then returns the phone number 
-     * @param string $adminPhone
-     * @return string $adminPhone
-     */
-    public static function setAdminPhoneForEmergencies(string $adminPhone)
-    {
-
-        try {
-            $adminPhone = Settings::saveAdminPhoneForAlert($adminPhone);
-            return trans('panic.admin_phone_saved') . $adminPhone;
-        } catch (\Exception $e) {
-            return $e . trans('panic::panic.admin_phone_not_saved');
-        }
-        https: //app.mobi66.appmobilidadeurbana.com.br/api/v3/application/settings?user_type=user
-    }
 
     /**
      * This function converts a bearing received from the DB to a cardinal direction
@@ -392,6 +295,224 @@ class PanicRepository
                 $direction = $dir;
                 return $direction;
             }
+        }
+    }
+
+
+    //
+    //Lib Settings Functions
+    //
+
+    /**
+     * This function fetches the panic User Button Setting from the DB.
+     * @param null
+     * @return object $panicUserButtonSetting
+     */
+    public static function getPanicUserButtonSetting()
+    {
+        try {
+            $panicButtonUserSettings = Settings::getPanicButtonEnabledUser();
+            return (object) array(
+                'panic_button_enabled_user' => $panicButtonUserSettings
+            );
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+        };
+    }
+
+
+    /**
+     * This function saves the panic User Button Setting in the DB.
+     * @param string $setting
+     * @return object $panicProviderButtonSetting
+     */
+    public static function setPanicUserButtonSetting(string $setting)
+    {
+        try {
+            $panicButtonUserSettings = Settings::savePanicButtonEnabledUser($setting);
+            return $panicButtonUserSettings;
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+        };
+    }
+
+    /**
+     * This function fetches the panic Provider Button Setting from the DB.
+     * @param null
+     * @return object $panicProviderButtonSetting
+     */
+    public static function getPanicProviderButtonSetting()
+    {
+        try {
+            $panicButtonProviderSetting = Settings::getPanicButtonEnabledProvider();
+            return (object) array(
+                'panic_button_enabled_provider' => $panicButtonProviderSetting
+            );
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+        };
+    }
+
+    /**
+     * This function saves the panic User Button Setting in the DB.
+     * @param string $setting
+     * @return object $panicProviderButtonSetting
+     */
+    public static function setPanicProviderButtonSetting(string $setting)
+    {
+        try {
+            $panicButtonUserSettings = Settings::savePanicButtonEnabledProvider($setting);
+            return $panicButtonUserSettings;
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+        };
+        //https: //app.mobi66.appmobilidadeurbana.com.br/api/v3/application/settings?user_type=user
+    }
+
+    /**
+     * This function checks if the admin is using a Security Provider Agency, if so, the value is passed upon validation of the request;
+     * @return string $securityAgency || null
+     */
+    public static function getSecurityProviderAgency()
+    {
+        $securityAgency = Settings::getSecurityProviderAgency();
+        if ($securityAgency = "segup") {
+            return $securityAgency;
+        } else return trans('panic::panic.no_security_agency');
+    }
+
+    /**
+     * This function saves the security provider agency into the db;
+     * @return string $securityAgencyFromRepository || null
+     */
+    public static function setSecurityProviderAgency($securityProviderAgency)
+    {
+        try {
+            $securityAgencyFromRepository = Settings::saveSecurityProviderAgency($securityProviderAgency);
+            return $securityAgencyFromRepository;
+        } catch (\Exception $e) {
+            return \Log::error($e->getMessage());;
+        }
+    }
+
+    /**
+     * This function will try to get a value for the segup login from the DB;
+     * @return string $segupLogin || null
+     */
+    public static function getSegupLogin()
+    {
+        $segupLogin = Settings::getSegupLogin();
+        if ($segupLogin != null) {
+            return $segupLogin;
+        } else return trans('panic::no_segup_login');
+    }
+
+    /**
+     * This function saves the segup login into the db;
+     * @return string $segupLogin || null
+     */
+    public static function setSegupLogin($segupLogin)
+    {
+        try {
+            $segupLoginRepository = Settings::saveSegupLogin($segupLogin);
+            return $segupLoginRepository;
+        } catch (\Exception $e) {
+            return \Log::error($e->getMessage());;
+        }
+    }
+
+    /**
+     * This function will try to get a value for the segup Password  from the DB;
+     * @return string $segupPassword || null
+     */
+    public static function getSegupPassword()
+    {
+        $segupPassword = Settings::getSegupPassword();
+        if ($segupPassword != null) {
+            return $segupPassword;
+        } else return trans('panic::no_segup_password');
+    }
+
+    /**
+     * This function saves the segup password  into the db;
+     * @return string $segupPassword || null
+     */
+    public static function setSegupPassword($segupPassword)
+    {
+        try {
+            $segupPasswordRepository = Settings::saveSegupPassword($segupPassword);
+            return $segupPasswordRepository;
+        } catch (\Exception $e) {
+            return \Log::error($e->getMessage());;
+        }
+    }
+
+    /**
+     * This function will try to get a value for the segup Password  from the DB;
+     * @return string $segupRequestUrl || null
+     */
+    public static function getSegupRequestUrl()
+    {
+        $segupRequestUrl = Settings::getSegupRequestUrl();
+        if ($segupRequestUrl != null) {
+            return $segupRequestUrl;
+        } else return trans('panic::no_segup_url');
+    }
+
+    /**
+     * This function saves the segup request url  into the db;
+     * @return string $segupRequestUrl || null
+     */
+    public static function setSegupRequestUrl($segupRequestUrl)
+    {
+        try {
+            $segupRequestUrlRepository = Settings::saveSegupRequestUrl($segupRequestUrl);
+            return $segupRequestUrlRepository;
+        } catch (\Exception $e) {
+            return \Log::error($e->getMessage());;
+        }
+    }
+
+    /**
+     * This function will try to get a value for the segup Password  from the DB;
+     * @return string $segupVerificationUrl || null
+     */
+    public static function getSegupVerificationUrl()
+    {
+        $segupVerificationUrl = Settings::getSegupVerificationUrl();
+        if ($segupVerificationUrl != null) {
+            return $segupVerificationUrl;
+        } else return trans('panic::no_segup_verification_url');
+    }
+
+    /**
+     * This function saves the segup verification url  into the db;
+     * @return string $segupVerificationUrl || null
+     */
+    public static function setSegupVerificationUrl($segupVerificationUrl)
+    {
+        try {
+            $segupVerificationRepository = Settings::saveSegupVerificationUrl($segupVerificationUrl);
+            return $segupVerificationRepository;
+        } catch (\Exception $e) {
+            return \Log::error($e->getMessage());;
+        }
+    }
+
+    /**
+     * This function sets an admin phone on the Settings Table in the DB;
+     * and then returns the phone number 
+     * @param string $adminPhone
+     * @return string $adminPhone
+     */
+    public static function setAdminPhoneForEmergencies(string $adminPhone)
+    {
+
+        try {
+            $adminPhone = Settings::saveAdminPhoneForAlert($adminPhone);
+            return trans('panic.admin_phone_saved') . $adminPhone;
+        } catch (\Exception $e) {
+            return $e . trans('panic::panic.admin_phone_not_saved');
         }
     }
 };
