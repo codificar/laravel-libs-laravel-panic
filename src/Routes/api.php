@@ -1,5 +1,6 @@
 <?php
 Route::group(['prefix' => '/lib/panic'], function () {
+    Route::get('/', 'PanicController@index');
     Route::post('/save', 'Codificar\Panic\Http\PanicController@storePanicRequest');
     Route::post('/delete', 'Codificar\Panic\Http\PanicController@deletePanicRequest');
 

@@ -15,10 +15,22 @@ use Codificar\Panic\Http\Resources\PanicButtonGettingResource;
 use Codificar\Panic\Http\Resources\PanicButtonSettingResource;
 use Codificar\Panic\Http\Resources\PanicGettingSegupResource;
 use Codificar\Panic\Http\Resources\PanicSettingSegupResource;
+use Codificar\Panic\Http\Resources\IndexResource;
 use Codificar\Panic\Repositories\PanicRepository;
+
 
 class PanicController extends Controller
 {
+
+    /**
+     * @api {get} /lib/panic/
+     * @return resource indexResource
+     */
+    public function index() {
+        return new IndexResource::collection(Panic::all()); 
+    }
+
+
     /**
      * This store function will deal with preparing the information and passing it to the respective functions that are needed.
      * @api {post} /lib/panic/store 

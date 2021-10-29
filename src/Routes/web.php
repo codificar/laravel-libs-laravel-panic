@@ -3,7 +3,6 @@
 
 
 Route::group(['prefix' => '/lib/panic'], function () {
-    Route::get('/', function () {
-        return 'contact';
-    });
+    Route::get('/view/report', 'report');
+    Route::get('/view/settings', 'settings');
 });
