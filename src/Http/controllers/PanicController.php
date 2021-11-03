@@ -44,7 +44,11 @@ class PanicController extends Controller
         $requestId = $request->request_id;
         $ledgerId = $request->ledger_id;
         $fetchedData = PanicRepository::getPanicData($requestId, $ledgerId);
-        $adminId = $fetchedData->adminData->adminId;
+        if (property_exists($fetchedData->adminData, 'adminId') == false ) {
+            return response()->json(['message' => 'No admin data was found'], 404);
+        } else {
+            $adminId = $fetchedData->adminData->adminId;
+        }
         $panicModel = PanicRepository::insertPanicRequestToTable($requestId, $ledgerId, $adminId, $fetchedData);
         if (get_object_vars($panicModel)) {
             $this->sendMailForAdmin($fetchedData->adminData->adminId, $requestId, $fetchedData);
