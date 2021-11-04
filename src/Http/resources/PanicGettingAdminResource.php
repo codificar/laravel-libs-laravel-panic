@@ -17,7 +17,7 @@ class PanicGettingAdminResource extends JsonResource
         return [
             'panic_admin_id' => $this->panic_admin_id,
             'panic_admin_phone_number' => $this->panic_admin_phone_number,
-            'panic_admin_email' => $this->panic_admin_email,
+            'panic_admin_email' => $this->panic_admin_mail,
         ];
     }
 }
