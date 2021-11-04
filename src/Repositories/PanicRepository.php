@@ -515,7 +515,7 @@ class PanicRepository
     {
         try {
             $adminPhone = Settings::savePanicAdminPhone($adminPhone);
-            return trans('panic::admin_phone_saved') . $adminPhone;
+            return $adminPhone;
         } catch (\Exception $e) {
             return $e . trans('panic::panic.admin_phone_not_saved');
         }
