@@ -260,3 +260,96 @@ function getProviderTimeout()
     else
         return 60;
 }
+
+
+public static function getAdminEmail()
+{
+    $settings = self::where('key', 'admin_email_address')->first();
+
+    if ($settings)
+        return $settings->value;
+    else
+        return 'admin@localhost';
+}
+
+public static function saveAdminEmail($setting)
+{
+    try {
+        $settings = Settings::updateOrCreate(
+            ['key' => 'admin_email_address'],
+            ['value' => $setting]
+        );
+        return $settings;
+    } catch (\Exception $e) {
+        return $e;
+    }
+}
+
+public static function getPanicAdminEmail()
+{
+    $settings = self::where('key', 'panic_admin_email')->first();
+
+    if ($settings)
+        return $settings->value;
+    else
+        return 'No Panic Admin Email Adress Set';
+}
+
+public static function savePanicAdminEmail($setting)
+{
+    try {
+        $settings = Settings::updateOrCreate(
+            ['key' => 'panic_admin_email'],
+            ['value' => $setting]
+        );
+        return $settings;
+    } catch (\Exception $e) {
+        return $e;
+    }
+}
+
+public static function getPanicAdminId()
+{
+    $settings = self::where('key', 'panic_admin_id')->first();
+
+    if ($settings)
+        return $settings->value;
+    else
+        return '1';
+}
+
+public static function savePanicAdminId($setting)
+{
+    try {
+        $settings = Settings::updateOrCreate(
+            ['key' => 'panic_admin_id'],
+            ['value' => $setting]
+        );
+        return $settings;
+    } catch (\Exception $e) {
+        return $e;
+    }
+}
+
+public static function getPanicAdminPhone()
+{
+    $settings = self::where('key', 'panic_admin_phone_number')->first();
+
+    if ($settings) {
+        return $settings->value;
+    } else return 'No Admin Phone';
+}
+
+public static function savePanicAdminPhone($setting)
+{
+    try {
+        $settings = Settings::updateOrCreate(
+            ['key' => 'panic_admin_phone_number'],
+            ['value' => $setting]
+        );
+        return $settings;
+    } catch (\Exception $e) {
+        return false;
+    }
+}
+
