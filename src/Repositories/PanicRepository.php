@@ -177,11 +177,12 @@ class PanicRepository
         try {
             $adminMail = Settings::getAdminEmail();
             $adminPhone = Settings::getAdminPhone();
-            $adminId = Admin::where('username', $adminMail)->firstOrFail(['id']);
+            $adminId = Settings::getAdminId();
+
             $adminData = (object) array(
                 'adminPhone' => $adminPhone,
                 'adminMail' => $adminMail,
-                'adminId' => $adminId->id
+                'adminId' => $adminId,
             );
             return $adminData;
         } catch (\Exception $e) {
@@ -499,20 +500,90 @@ class PanicRepository
         }
     }
 
+    //create trans no admin phone
+    //create trans no admin mail
+    //create trans no admin id
+    //TODO: create tests for these functions
+
     /**
      * This function sets an admin phone on the Settings Table in the DB;
      * and then returns the phone number 
      * @param string $adminPhone
      * @return string $adminPhone
      */
-    public static function setAdminPhoneForEmergencies(string $adminPhone)
+    public static function setPanicAdminPhone(string $adminPhone)
     {
-
         try {
-            $adminPhone = Settings::saveAdminPhoneForAlert($adminPhone);
-            return trans('panic.admin_phone_saved') . $adminPhone;
+            $adminPhone = Settings::savePanicAdminPhone($adminPhone);
+            return trans('panic::admin_phone_saved') . $adminPhone;
         } catch (\Exception $e) {
             return $e . trans('panic::panic.admin_phone_not_saved');
+        }
+    }
+
+    /**
+     * This function fetches the admin phone from the settings table from the DB then returns the number
+     * @return string $adminPhone
+     */
+    public static function getPanicAdminPhone()
+    {
+        $adminPhone = Settings::getPanicAdminPhone();
+        if ($adminPhone != null) {
+            return $adminPhone;
+        } else return trans('panic::no_admin_phone');
+    }
+
+    /**
+     * This function receives the admin mail from a route then saves it into the settings table.
+     * @param string $setting
+     * @return object $admin_mail
+     */
+    public static function setPanicAdminEmail(string $setting)
+    {
+        try {
+            $PanicAdminMail = Settings::savePanicAdminEmail($setting);
+            return $PanicAdminMail;
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+        }
+    }
+
+    //TODO: change trans
+    /**
+     * This function fetches the admin mail from the settings table from the DB then returns it
+     * @return string $adminMail
+     */
+    public static function getPanicAdminEmail()
+    {
+        $adminPhone = Settings::getPanicAdminEmail();
+        if ($adminPhone != null) {
+            return $adminPhone;
+        } else return trans('panic::no_admin_phone');
+    }
+
+    //TODO: change trans 
+    /**
+     * This function fetches the admin id from the settings table from the DB then returns it
+     * @return string $adminMail
+     */
+    public static function getPanicAdminId()
+    {
+        $adminId = Settings::getPanicAdminId();
+        if ($adminId != null) {
+            return $adminId;
+        } else return trans('panic::no_admin_phone');
+    }
+
+    /**
+     * This function sets a panic admin Id in the settings table then returns the value
+     */
+    public static function setPanicAdminId(string $setting)
+    {
+        try {
+            $PanicAdminId = Settings::savePanicAdminId($setting);
+            return $PanicAdminId;
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
         }
     }
 };
