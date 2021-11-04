@@ -208,9 +208,9 @@ class PanicController extends Controller
         $adminId = PanicRepository::setPanicAdminId($panicAdminId);
 
         $panicAdminSettings = (object) array(
-            'panic_admin_mail' => $adminMail,
-            'panic_admin_phone_number' => $adminPhone,
-            'panic_admin_id' => $adminId,
+            'panic_admin_mail' => $adminMail->value,
+            'panic_admin_phone_number' => $adminPhone->value,
+            'panic_admin_id' => $adminId->value,
         );
 
         return new PanicSettingAdminResource($panicAdminSettings);
