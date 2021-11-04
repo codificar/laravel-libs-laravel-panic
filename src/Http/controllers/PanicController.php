@@ -3,11 +3,13 @@
 namespace Codificar\Panic\Http;
 
 use App\Http\Controllers\Controller;
+use Settings;
+use Carbon\Carbon;
+use Codificar\Panic\Models\Panic;
 use Codificar\Panic\Http\Resources\PanicDeletedResource;
 use Codificar\Panic\Http\Resources\PanicSuccessfulResource;
 use Codificar\Panic\Http\Resources\PanicOnlyCreatedResource;
-use Settings;
-use Carbon\Carbon;
+use Codificar\Panic\Http\Requests\PanicSettingAdminRequest;
 use Codificar\Panic\Http\Requests\PanicSettingStoreRequest;
 use Codificar\Panic\Http\Requests\PanicSettingSegupRequest;
 use Codificar\Panic\Http\Requests\PanicStoreRequest;
@@ -15,6 +17,8 @@ use Codificar\Panic\Http\Resources\PanicButtonGettingResource;
 use Codificar\Panic\Http\Resources\PanicButtonSettingResource;
 use Codificar\Panic\Http\Resources\PanicGettingSegupResource;
 use Codificar\Panic\Http\Resources\PanicSettingSegupResource;
+use Codificar\Panic\Http\Resources\PanicSettingAdminResource;
+use Codificar\Panic\Http\Resources\PanicGettingAdminResource;
 use Codificar\Panic\Http\Resources\IndexResource;
 use Codificar\Panic\Repositories\PanicRepository;
 
@@ -26,8 +30,9 @@ class PanicController extends Controller
      * @api {get} /lib/panic/
      * @return resource indexResource
      */
-    public function index() {
-        return new IndexResource::collection(Panic::all()); 
+    public function index()
+    {
+        return new IndexResource(Panic::all());
     }
 
 
@@ -44,11 +49,7 @@ class PanicController extends Controller
         $requestId = $request->request_id;
         $ledgerId = $request->ledger_id;
         $fetchedData = PanicRepository::getPanicData($requestId, $ledgerId);
-        if (property_exists($fetchedData->adminData, 'adminId') == false ) {
-            return response()->json(['message' => 'No admin data was found'], 404);
-        } else {
-            $adminId = $fetchedData->adminData->adminId;
-        }
+        $adminId = $fetchedData->adminData->adminId;
         $panicModel = PanicRepository::insertPanicRequestToTable($requestId, $ledgerId, $adminId, $fetchedData);
         if (get_object_vars($panicModel)) {
             $this->sendMailForAdmin($fetchedData->adminData->adminId, $requestId, $fetchedData);
@@ -187,6 +188,52 @@ class PanicController extends Controller
             'security_provider_agency' => $panicSecurityProviderAgency
         );
         return new PanicGettingSegupResource($panicRepositorySettings);
+    }
+
+    /**
+     * @api {post} /lib/panic/settings/save/admin
+     * @param $request->panic_admin_id
+     * @param $request->panic_admin_phone_number
+     * @param $request->panic_admin_email
+     * @return resource PanicSettingAdminResource
+     */
+    public static function savePanicAdminSettings(PanicSettingAdminRequest $request)
+    {
+        $panicAdminId = $request->panic_admin_id;
+        $panicAdminPhone = $request->panic_admin_phone_number;
+        $panicAdminEmail = $request->panic_admin_email;
+
+        $adminMail = PanicRepository::setPanicAdminEmail($panicAdminEmail);
+        $adminPhone = PanicRepository::setPanicAdminPhone($panicAdminPhone);
+        $adminId = PanicRepository::setPanicAdminId($panicAdminId);
+
+        $panicAdminSettings = (object) array(
+            'panic_admin_mail' => $adminMail,
+            'panic_admin_phone_number' => $adminPhone,
+            'panic_admin_id' => $adminId,
+        );
+
+        return new PanicSettingAdminResource($panicAdminSettings);
+    }
+
+    /**
+     * This function will return the panic segup settings that are needed from the database
+     * @api {get}/lib/panic/settings/admin
+     * @return resource PanicGettingAdminResource
+     */
+    public static function getPanicAdminSettings()
+    {
+        $adminMail = PanicRepository::getPanicAdminEmail();
+        $adminPhone = PanicRepository::getPanicAdminPhone();
+        $adminId = PanicRepository::getPanicAdminId();
+
+        $panicAdminSettings = (object) array(
+            'panic_admin_mail' => $adminMail,
+            'panic_admin_phone_number' => $adminPhone,
+            'panic_admin_id' => $adminId,
+        );
+
+        return new PanicGettingAdminResource($panicAdminSettings);
     }
 
     /**
