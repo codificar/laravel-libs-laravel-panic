@@ -179,12 +179,21 @@ class PanicRepository
             $adminPhone = Settings::getPanicAdminPhone();
             $adminId = Settings::getPanicAdminId();
 
-            $adminData = (object) array(
-                'adminPhone' => $adminPhone,
-                'adminMail' => $adminMail,
-                'adminId' => $adminId,
-            );
-            return $adminData;
+            if ($adminId == null) {
+                $adminData = (object) array(
+                    'adminPhone' => $adminPhone,
+                    'adminMail' => $adminMail,
+                    'adminId' => '1',
+                );
+                return $adminData;
+            } else {
+                $adminData = (object) array(
+                    'adminPhone' => $adminPhone,
+                    'adminMail' => $adminMail,
+                    'adminId' => $adminId,
+                );
+                return $adminData;
+            }
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
         };
