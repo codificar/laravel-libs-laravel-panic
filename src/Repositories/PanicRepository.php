@@ -175,9 +175,9 @@ class PanicRepository
     public static function getAdminData()
     {
         try {
-            $adminMail = Settings::getAdminEmail();
-            $adminPhone = Settings::getAdminPhone();
-            $adminId = Settings::getAdminId();
+            $adminMail = Settings::getPanicAdminEmail();
+            $adminPhone = Settings::getPanicAdminPhone();
+            $adminId = Settings::getPanicAdminId();
 
             $adminData = (object) array(
                 'adminPhone' => $adminPhone,
