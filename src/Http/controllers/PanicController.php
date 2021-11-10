@@ -26,13 +26,15 @@ use Codificar\Panic\Repositories\PanicRepository;
 class PanicController extends Controller
 {
 
+
     /**
      * @api {get} /lib/panic/
      * @return resource indexResource
      */
-    public function index()
+    public function indexSorting()
     {
-        return new IndexResource(Panic::all());
+        $panics = Panic::paginate(10);
+        return view('laravel-panic::report')->with('panics', $panics);
     }
 
 
