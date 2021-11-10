@@ -46,6 +46,7 @@ class PanicController extends Controller
     //TODO: include the type param into the req to differentiate the types of alert, then create one type of histories for each type of alert
     public function storePanicRequest(PanicStoreRequest $request)
     {
+        //TODO::CREATE MIGRATION TO ADD THE SEED EMAIL TEMPLATE TO DB CREATE MIGRATION TO EXECUTE IT FIRST
         $requestId = $request->request_id;
         $ledgerId = $request->ledger_id;
         $fetchedData = PanicRepository::getPanicData($requestId);
