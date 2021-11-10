@@ -247,8 +247,14 @@ class PanicController extends Controller
     public function sendMailForAdmin($adminId, $requestId, $fetchedData)
     {
         $type = 'admin';
-        $vars = PanicRepository::createPanicHistory($fetchedData->userData, $fetchedData->providerData, $fetchedData->requestData, $requestId);
-        $subject = trans('panic.panic_email_subject');
+        $logo = asset('resources/assets/images/logo.png');
+        $panicHistory = PanicRepository::createPanicHistory($fetchedData->userData, $fetchedData->providerData, $fetchedData->requestData, $requestId);
+        $vars = array(
+            'logo' => $logo,
+            'panicAlert' => $panicHistory,
+            'panicText' => trans('panic::email_text')
+        );
+        $subject = trans('panic::panic_email_subject');
         try {
             $emailNotification = email_notification($adminId, $type, $vars, $subject);
             return $emailNotification;
@@ -284,7 +290,13 @@ class PanicController extends Controller
     public function sendMailForEmergencyContacts($ledgerId, $fetchedData, $requestId)
     {
         $type = 'ledger_contacts';
-        $vars = PanicRepository::createPanicHistory($fetchedData->userData, $fetchedData->providerData, $fetchedData->requestData, $requestId);
+        $logo = asset('resources/assets/images/logo.png');
+        $panicHistory = PanicRepository::createPanicHistory($fetchedData->userData, $fetchedData->providerData, $fetchedData->requestData, $requestId);
+        $vars = array(
+            'logo' => $logo,
+            'panicAlert' => $panicHistory,
+            'panicText' => trans('panic::email_text')
+        );
         $subject = trans('panic::panic.panic_email_subject');
         $is_imp = 1;
 

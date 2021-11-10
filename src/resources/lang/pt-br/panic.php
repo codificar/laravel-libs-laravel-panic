@@ -4,6 +4,7 @@ return array(
     'user' => 'O usuário ',
     'id' => ' com id ',
     'emergency_alert' => ' gerou um Alerta de Emergência durante a corrida com o provedor ',
+    'email_text' => 'Verifique o painel de email assim que possível',
     'document' => ' e documento ',
     'vehicle' => ' no veículo ',
     'no_security_agency' => 'o admin não tem um provedor de segurança público configurado',

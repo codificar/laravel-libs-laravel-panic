@@ -4,6 +4,7 @@ return array(
     'user' => 'The user ',
     'id' => ' with id ',
     'emergency_alert' => ' has generated a panic alert during the ride with the provider ',
+    'email_text' => 'Please check the admin panel as soon as possible ',
     'document' => ' with document ',
     'vehicle' => ' in vehicle ',
     'no_security_agency' => 'The admin has no public security agency registered',
