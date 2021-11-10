@@ -90,13 +90,13 @@ class PanicRepository
      * @param int $ledgerId
      * @return object $partiesData
      */
-    public static function getPartiesData($ledgerId)
+    public static function getPartiesData($requestId)
     {
         $partiesData = new stdClass();
         try {
-            $partiesData = Ledger::where('id', $ledgerId)->first([
+            $partiesData = Request::where('id', $requestId)->first([
                 'user_id',
-                'provider_id'
+                'current_provider'
             ]);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
@@ -117,6 +117,7 @@ class PanicRepository
         $userData = new stdClass();
         try {
             $userData = User::where('id', $userId)->firstOrFail([
+                'id',
                 'first_name',
                 'last_name'
             ]);
@@ -136,6 +137,7 @@ class PanicRepository
         $providerData = new stdClass();
         try {
             $providerData = Provider::where('id', $providerId)->firstOrFail([
+                'id',
                 'first_name',
                 'last_name',
                 'document',
@@ -211,7 +213,7 @@ class PanicRepository
     {
         if (get_object_vars($userData)  && get_object_vars($providerData)  && get_object_vars($requestData)) {
 
-            $panicHistory = trans('panic::panic.user') . $userData->first_name . " " . $userData->last_name . trans('panic::panic.id') . $requestId . trans('panic::panic.emergency_alert') .
+            $panicHistory = trans('panic::panic.user') . $userData->first_name . " " . $userData->last_name . trans('panic::panic.id') . $userData->id . trans('panic::panic.emergency_alert') .
                 $providerData->first_name . " " . $providerData->last_name . trans('panic::panic.id') . $requestId . trans('panic::panic.document')
                 . $providerData->document . trans('panic::panic.vehicle')
                 . $providerData->car_brand . " " . $providerData->car_model . " " . $providerData->car_color . " " . $providerData->car_number;
@@ -225,14 +227,14 @@ class PanicRepository
      * @param int $ledgerId
      * @return object $fetchedPanicData
      */
-    public static function getPanicData(int $requestId, int $ledgerId)
+    public static function getPanicData(int $requestId)
     {
-        $partiesData = PanicRepository::getPartiesData($ledgerId);
+        $partiesData = PanicRepository::getPartiesData($requestId);
 
         if ($partiesData != null && $partiesData->user_id != null && $partiesData->provider_id != null) {
             $requestData = PanicRepository::getRequestLocationData($requestId);
             $userData = PanicRepository::getUserData($partiesData->user_id);
-            $providerData = PanicRepository::getProviderData($partiesData->provider_id);
+            $providerData = PanicRepository::getProviderData($partiesData->current_provider);
             $adminData = PanicRepository::getAdminData();
 
             $fetchedPanicData = (object) array(
@@ -386,7 +388,7 @@ class PanicRepository
     public static function getSecurityProviderAgency()
     {
         $securityAgency = Settings::getSecurityProviderAgency();
-        if ($securityAgency = "segup") {
+        if ($securityAgency == "segup") {
             return $securityAgency;
         } else return trans('panic::panic.no_security_agency');
     }

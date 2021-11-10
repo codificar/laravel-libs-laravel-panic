@@ -48,7 +48,7 @@ class PanicController extends Controller
     {
         $requestId = $request->request_id;
         $ledgerId = $request->ledger_id;
-        $fetchedData = PanicRepository::getPanicData($requestId, $ledgerId);
+        $fetchedData = PanicRepository::getPanicData($requestId);
         $adminId = $fetchedData->adminData->adminId;
         $panicModel = PanicRepository::insertPanicRequestToTable($requestId, $ledgerId, $adminId, $fetchedData);
         if (get_object_vars($panicModel)) {
