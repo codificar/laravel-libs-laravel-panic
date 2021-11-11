@@ -13,6 +13,10 @@ class PanicServiceProvider extends ServiceProvider
         $this->loadViewsFrom(__DIR__ . '/resources/views', 'laravel-panic');
         $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
         $this->loadTranslationsFrom(__DIR__ . '/resources/lang', 'panic');
+
+        $this->publishes([
+            __DIR__ . '/database/seeds' => database_path('seeds'),
+        ], 'public_vuejs_libs');
     }
     public function register()
     {
