@@ -268,6 +268,46 @@ class PanicController extends Controller
     }
 
     /**
+     * This function will send emails to thel ledger contactst registered in the ledger_contacts table.
+     * @param int $ledgerId
+     * @param object $fetchedData
+     * @param int $requestId
+     * @return bool true || false
+     */
+    public function sendMailForEmergencyContacts($ledgerId, $fetchedData, $requestId)
+    {
+        $type = 'ledger_contacts';
+        $vars = PanicRepository::createPanicHistory($fetchedData->userData, $fetchedData->providerData, $fetchedData->requestData, $requestId);
+        $subject = trans('panic::panic.panic_email_subject');
+        $is_imp = 1;
+
+        try {
+            $emailForEmergencyContacts = email_notification($ledgerId, $type, $vars, $subject, $is_imp);
+            return $emailForEmergencyContacts;
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+        }
+    }
+
+    /**
+     * This function will send an sms for the admin registered in the db.
+     * @param int $adminId
+     * @return bool true || false
+     */
+    public function sendSmsForAdmin($adminId)
+    {
+        try {
+            $type = 'admin';
+            $messsage =  trans('panic.panic_sms_message');
+            sms_notification($adminId, $messsage, $type);
+            return true;
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+        }
+    }
+
+
+    /**
      * This function will send an sms for the ledger contacts registered in the ledger_contacts table.
      * @param int $ledgerId
      * @return bool true || false

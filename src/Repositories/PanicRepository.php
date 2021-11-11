@@ -232,7 +232,7 @@ class PanicRepository
     {
         $partiesData = PanicRepository::getPartiesData($requestId);
 
-        if ($partiesData != null && $partiesData->user_id != null && $partiesData->provider_id != null) {
+        if ($partiesData != null && $partiesData->user_id != null && $partiesData->confirmed_provider != null) {
             $requestData = PanicRepository::getRequestLocationData($requestId);
             $userData = PanicRepository::getUserData($partiesData->user_id);
             $providerData = PanicRepository::getProviderData($partiesData->confirmed_provider);
