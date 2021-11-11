@@ -3,6 +3,7 @@
 namespace Codificar\Panic\Repositories;
 
 use Illuminate\Support\Carbon;
+use Requests;
 use Settings;
 use User;
 use Admin;
@@ -94,9 +95,9 @@ class PanicRepository
     {
         $partiesData = new stdClass();
         try {
-            $partiesData = Request::where('id', $requestId)->first([
+            $partiesData = Requests::where('id', $requestId)->first([
                 'user_id',
-                'current_provider'
+                'confirmed_provider'
             ]);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
@@ -234,7 +235,7 @@ class PanicRepository
         if ($partiesData != null && $partiesData->user_id != null && $partiesData->provider_id != null) {
             $requestData = PanicRepository::getRequestLocationData($requestId);
             $userData = PanicRepository::getUserData($partiesData->user_id);
-            $providerData = PanicRepository::getProviderData($partiesData->current_provider);
+            $providerData = PanicRepository::getProviderData($partiesData->confirmed_provider);
             $adminData = PanicRepository::getAdminData();
 
             $fetchedPanicData = (object) array(

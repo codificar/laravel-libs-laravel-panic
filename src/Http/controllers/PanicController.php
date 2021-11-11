@@ -248,7 +248,7 @@ class PanicController extends Controller
      */
     public function sendMailForAdmin($adminId, $requestId, $fetchedData)
     {
-        $type = 'admin';
+        $type = 'panic_admin';
         $logo = asset('resources/assets/images/logo.png');
         $panicHistory = PanicRepository::createPanicHistory($fetchedData->userData, $fetchedData->providerData, $fetchedData->requestData, $requestId);
         $vars = array(
@@ -257,54 +257,11 @@ class PanicController extends Controller
             'panicText' => trans('panic::email_text')
         );
         $subject = trans('panic::panic_email_subject');
+        $key = 'panic_request';
+        $is_imp = "imp";
         try {
-            $emailNotification = email_notification($adminId, $type, $vars, $subject);
+            $emailNotification = email_notification($adminId, $type, $vars, $subject, $key, $is_imp);
             return $emailNotification;
-        } catch (\Exception $e) {
-            \Log::error($e->getMessage());
-        }
-    }
-
-    /**
-     * This function will send an sms for the admin registered in the db.
-     * @param int $adminId
-     * @return bool true || false
-     */
-    public function sendSmsForAdmin($adminId)
-    {
-        try {
-            $type = 'admin';
-            $messsage =  trans('panic.panic_sms_message');
-            sms_notification($adminId, $messsage, $type);
-            return true;
-        } catch (\Exception $e) {
-            \Log::error($e->getMessage());
-        }
-    }
-
-    /**
-     * This function will send emails to thel ledger contactst registered in the ledger_contacts table.
-     * @param int $ledgerId
-     * @param object $fetchedData
-     * @param int $requestId
-     * @return bool true || false
-     */
-    public function sendMailForEmergencyContacts($ledgerId, $fetchedData, $requestId)
-    {
-        $type = 'ledger_contacts';
-        $logo = asset('resources/assets/images/logo.png');
-        $panicHistory = PanicRepository::createPanicHistory($fetchedData->userData, $fetchedData->providerData, $fetchedData->requestData, $requestId);
-        $vars = array(
-            'logo' => $logo,
-            'panicAlert' => $panicHistory,
-            'panicText' => trans('panic::email_text')
-        );
-        $subject = trans('panic::panic.panic_email_subject');
-        $is_imp = 1;
-
-        try {
-            $emailForEmergencyContacts = email_notification($ledgerId, $type, $vars, $subject, $is_imp);
-            return $emailForEmergencyContacts;
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
         }
