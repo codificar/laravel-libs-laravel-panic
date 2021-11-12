@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 
-class PanicEmailTemplateSeed extends Migration
+class RunPanicRequestEmailSeeder extends Migration
 {
     /**
      * Run the migrations.
