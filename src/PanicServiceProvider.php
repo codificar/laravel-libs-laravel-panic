@@ -17,7 +17,7 @@ class PanicServiceProvider extends ServiceProvider
         //to be able to run the migration to run the seeder automatically, you need to publish it to the main app first then run the migration
         $this->publishes([
             __DIR__ . '/database/seeds' => database_path('seeds'),
-        ], 'panic-seeds');
+        ], 'public_vuejs_libs');
     }
     public function register()
     {
