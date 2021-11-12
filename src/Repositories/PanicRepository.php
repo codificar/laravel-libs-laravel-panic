@@ -31,7 +31,7 @@ class PanicRepository
         $insertedEntry = new stdClass();
 
         try {
-            $requestHistory = PanicRepository::createPanicHistory($fetchedData->userData, $fetchedData->providerData, $fetchedData->requestData, $requestId);
+            $requestHistory = self::createPanicHistory($fetchedData->userData, $fetchedData->providerData, $fetchedData->requestData, $requestId);
             $panic = new Panic();
             $panic->ledger_id = $ledgerId;
             $panic->request_id = $requestId;
@@ -210,7 +210,7 @@ class PanicRepository
      * @param int $requestId
      * @return string $panicHistory
      */
-    public static function createPanicHistory(object $userData, object $providerData, object $requestData, int $requestId)
+    public static function createPanicHistory($userData, $providerData, $requestData, $requestId)
     {
         if (get_object_vars($userData)  && get_object_vars($providerData)  && get_object_vars($requestData)) {
 
@@ -225,10 +225,9 @@ class PanicRepository
     /**
      * This function fetches the needed data for the panic requests
      * @param int $requestId
-     * @param int $ledgerId
      * @return object $fetchedPanicData
      */
-    public static function getPanicData(int $requestId)
+    public static function getPanicData($requestId)
     {
         $partiesData = PanicRepository::getPartiesData($requestId);
 
@@ -254,7 +253,7 @@ class PanicRepository
      * @param object $requestData
      * @return array $panicRequestBody
      */
-    public static function createSegupRequestBody(object $providerData, object $requestData)
+    public static function createSegupRequestBody($providerData, $requestData)
     {
         try {
             if ($requestData->bearing <= 0.0 || $requestData->bearing >= 360) {
@@ -286,7 +285,7 @@ class PanicRepository
      * @param float $bearing
      * @return string $direction
      */
-    public static function getDirectionFromBearing(float $bearing)
+    public static function getDirectionFromBearing($bearing)
     {
         if ($bearing > 337.5 && $bearing < 360 || $bearing < 0 && $bearing > 22.5) {
             return "N";
@@ -339,7 +338,7 @@ class PanicRepository
      * @param string $setting
      * @return object $panicProviderButtonSetting
      */
-    public static function setPanicUserButtonSetting(string $setting)
+    public static function setPanicUserButtonSetting($setting)
     {
         try {
             $panicButtonUserSettings = Settings::savePanicButtonEnabledUser($setting);
@@ -523,7 +522,7 @@ class PanicRepository
      * @param string $adminPhone
      * @return string $adminPhone
      */
-    public static function setPanicAdminPhone(string $adminPhone)
+    public static function setPanicAdminPhone($adminPhone)
     {
         try {
             $adminPhone = Settings::savePanicAdminPhone($adminPhone);
@@ -589,7 +588,7 @@ class PanicRepository
     /**
      * This function sets a panic admin Id in the settings table then returns the value
      */
-    public static function setPanicAdminId(string $setting)
+    public static function setPanicAdminId($setting)
     {
         try {
             $PanicAdminId = Settings::savePanicAdminId($setting);
