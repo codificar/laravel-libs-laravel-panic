@@ -15,7 +15,7 @@ class PanicGettingSegupResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'succcess' => true,
+            'success' => true,
             'segup_login' => $this->segup_login,
             'segup_password' => $this->segup_password,
             'segup_request_url' => $this->segup_request_url,
