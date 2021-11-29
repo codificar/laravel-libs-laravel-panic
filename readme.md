@@ -1,14 +1,16 @@
-laravel-panic
+## Laravel-panic
+
 Lib para executar requisições de pânico para as secretarias de segurança indicadas.
 
-Requisitos
+## Requisitos
 
 1º: Verificar se as funções do helper do projeto existem e se estão de acordo com as funções do helper do projeto de mobilidade web5.
 
-Instalação
+## Instalação
 
 Adicione o pacote no composer.json:
 
+```
 "repositories": [
 {
 "type": "package",
@@ -23,16 +25,18 @@ Adicione o pacote no composer.json:
 }
 }
 ],
+```
 
-// ...
-
+```
 "require": {
 // ADD this
 "codificar/laravel-panic": "dev-master",
 },
+```
 
-Agora Adicione
+Agora Adicione no Autoload do Composer.json
 
+```
     "autoload": {
         //...
         "psr-4": {
@@ -41,35 +45,45 @@ Agora Adicione
             //...
         }
     },
-    //...
+```
 
 Execute
 
+```
 composer dump-autoload -o
+```
 
 Adicione a Classe no como Provider
 
+```
 'providers' => [
 ...,
 // The new package class
 Codificar\Panic\PanicServiceProvider::class,
 ],
+```
 
 Execute as migrations
 
+```
 php artisan migrate
+```
 
 Execute o artisan serve
 
+```
 php artisan serve
-
-Langs
-
--pt-br
-en
-ao
+```
 
 ---
+
+# Langs
+
+-pt-br
+-en
+-ao
+
+### ROTAS
 
 ## {POST} /lib/panic/save
 
@@ -178,8 +192,6 @@ ao
 | `panic_admin_id`           | Number | O Id do admin registrado para receber os alertas, deve ser igual ao id do admin registrado no painel. |
 | `panic_admin_phone_number` | Number | Telefone para enviar os alertas. Formato: +XXYYZZZZZZZZZ.                                             |
 | `panic_admin_email`        | String | Email para enviar os alertas.                                                                         |
-
----
 
 | Retorno                    | Tipo    | Descrição                                                                                             |
 | -------------------------- | ------- | ----------------------------------------------------------------------------------------------------- |
