@@ -331,13 +331,18 @@ class PanicController extends Controller
      */
     public static function sendPushToEmergencyContacts($ledgerId)
     {
-        $id = $ledgerId;
+        $tokens = \LedgerContact::getDeviceTokenContacts($ledgerId);
+
+        if(!$tokens)
+            return trans("panic::panic.push_no_ledger");
+
         $title = trans('panic.panic_push_title');
         $message = trans('panic.sms_message');
         $type = 'ledger_contact';
 
-        try {
-            send_notifications($id, $type, $title, $message);
+        try
+        {
+            send_notifications($tokens->toArray(), $type, $title, $message);
             return trans('Panic::panic.push_was_successful');
         } catch (\Exception $e) {
             \Log::error($e->getMessage());

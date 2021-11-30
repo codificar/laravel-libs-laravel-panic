@@ -23,4 +23,5 @@ return array(
     'no_segup_password' => 'Não há senha da SEGUP registrada no banco de dados',
     'no_segup_url' => 'Não há url da SEGUP registrada no banco de dados',
     'no_segup_verification_url' => 'Não há url de verificação de token da SEGUP registrada no banco de dados',
+    'push_no_ledger' => 'Contato não encontrado para envio de notificação'
 );

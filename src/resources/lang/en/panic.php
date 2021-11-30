@@ -23,4 +23,5 @@ return array(
     'no_segup_password' => 'No Segup Password in the Database',
     'no_segup_url' => 'No Segup Url in the Database',
     'no_segup_verification_url' => 'No Segup verification url in the Database',
+    'push_no_ledger' => 'Contact not found to send push notification'
 );
