@@ -26,5 +26,5 @@
 
 @section('javascripts')
 <script src="/libs/panic/lang.trans/setting"> </script> 
-<script src="{{ elixir('vendor/codificar/laravel-panic/panic.vue.js') }}"> </script> 
+<script src="{{ elixir('vendor/codificar/panic/panic.vue.js') }}"> </script> 
 @stop
