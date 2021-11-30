@@ -18,9 +18,7 @@
 @section('content')
 	<div id="VueJs" class="col-sm-12">
 		
-		<panicsettings 
-
-		>
+		<panicsettings>
 		</panicsettings>
 		
 	</div>

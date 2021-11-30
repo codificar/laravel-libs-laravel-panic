@@ -14,7 +14,7 @@ class PanicSettingSegupResource extends JsonResource
      */
     public function toArray($request)
     {
-        if ($this->request == false) {
+        if ($request == null) {
             $panicFailedMessage = trans('panic::panic.save_segup_setting_was_not_successful');
             return [
                 $panicFailedMessage
@@ -22,10 +22,10 @@ class PanicSettingSegupResource extends JsonResource
         } else
             return [
                 'success' => true,
-                'segup_login' => $this->segup_login,
-                'segup_password' => $this->segup_password,
-                'segup_request_url' => $this->segup_request_url,
-                'segup_verification_url' => $this->segup_verification_url,
+                'segup_login' => $this->segup_login->value,
+                'segup_password' => $this->segup_password->value,
+                'segup_request_url' => $this->segup_request_url->value,
+                'segup_verification_url' => $this->segup_verification_url->value,
             ];
     }
 }

@@ -17,6 +17,10 @@ class PanicServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../public/js' => public_path('vendor/codificar/panic'),
         ], 'public_vuejs_libs');
+
+        // $this->publishes([
+        //     __DIR__ . '/../public/js' => public_path('vendor/codificar/panic'),
+        // ], 'public_vuejs_libs');
     }
     public function register()
     {
