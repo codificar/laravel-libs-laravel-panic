@@ -14,7 +14,7 @@ class PanicSettingSegupResource extends JsonResource
      */
     public function toArray($request)
     {
-        if ($request == null) {
+        if (!isset($request) || (isset($request) && !$request)) {
             $panicFailedMessage = trans('panic::panic.save_segup_setting_was_not_successful');
             return [
                 $panicFailedMessage
