@@ -338,11 +338,10 @@ class PanicController extends Controller
 
         $title = trans('panic.panic_push_title');
         $message = trans('panic.sms_message');
-        $type = 'ledger_contact';
 
         try
         {
-            send_notifications($tokens->toArray(), $type, $title, $message);
+            send_android_push($tokens->toArray(), $title, $message); //android and ios push in same function
             return trans('Panic::panic.push_was_successful');
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
