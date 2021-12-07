@@ -254,9 +254,9 @@ class PanicController extends Controller
         $vars = array(
             'logo' => $logo,
             'panicAlert' => $panicHistory,
-            'panicText' => trans('panic::email_text')
+            'panicText' => trans('panic::panic.email_text')
         );
-        $subject = trans('panic::panic_email_subject');
+        $subject = trans('panic::panic.panic_email_subject');
         $key = 'panic_request';
         $is_imp = "imp";
         try {
