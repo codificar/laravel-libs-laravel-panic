@@ -55,7 +55,7 @@ class PanicController extends Controller
         $adminId = $fetchedData->adminData->adminId;
         $panicModel = PanicRepository::insertPanicRequestToTable($requestId, $ledgerId, $adminId, $fetchedData);
         if (get_object_vars($panicModel)) {
-            $this->sendMailForAdmin($fetchedData->adminData->adminId, $requestId, $fetchedData);
+            $this->sendMailForAdmin($fetchedData->adminData->adminId, $requestId, $fetchedData, $ledgerId);
             $this->sendSmsForAdmin($fetchedData->adminData->adminId);
             $this->sendMailForEmergencyContacts($ledgerId, $fetchedData, $requestId);
             $this->sendSmsForEmergencyContacts($ledgerId);
@@ -244,13 +244,14 @@ class PanicController extends Controller
      * @param int $adminId
      * @param int $requestId
      * @param object $fetchedData
+     * @param int $ledgerId
      * @return bool true || false
      */
-    public function sendMailForAdmin($adminId, $requestId, $fetchedData)
+    public function sendMailForAdmin($adminId, $requestId, $fetchedData, $ledgerId)
     {
         $type = 'panic_admin';
         $logo = asset('resources/assets/images/logo.png');
-        $panicHistory = PanicRepository::createPanicHistory($fetchedData->userData, $fetchedData->providerData, $fetchedData->requestData, $requestId);
+        $panicHistory = PanicRepository::createPanicHistory($fetchedData->userData, $fetchedData->providerData, $fetchedData->requestData, $requestId, $ledgerId);
         $vars = array(
             'logo' => $logo,
             'panicAlert' => $panicHistory,
@@ -277,7 +278,7 @@ class PanicController extends Controller
     public function sendMailForEmergencyContacts($ledgerId, $fetchedData, $requestId)
     {
         $type = 'ledger_contacts';
-        $vars = PanicRepository::createPanicHistory($fetchedData->userData, $fetchedData->providerData, $fetchedData->requestData, $requestId);
+        $vars = PanicRepository::createPanicHistory($fetchedData->userData, $fetchedData->providerData, $fetchedData->requestData, $requestId, $ledgerId);
         $subject = trans('panic::panic.panic_email_subject');
         $is_imp = 1;
 

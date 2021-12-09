@@ -31,7 +31,7 @@ class PanicRepository
         $insertedEntry = new stdClass();
 
         try {
-            $requestHistory = self::createPanicHistory($fetchedData->userData, $fetchedData->providerData, $fetchedData->requestData, $requestId);
+            $requestHistory = self::createPanicHistory($fetchedData->userData, $fetchedData->providerData, $fetchedData->requestData, $requestId, $ledgerId);
             $panic = new Panic();
             $panic->ledger_id = $ledgerId;
             $panic->request_id = $requestId;
@@ -208,16 +208,27 @@ class PanicRepository
      * @param object $providerData
      * @param object $requestData
      * @param int $requestId
+     * @param int $ledgerId
      * @return string $panicHistory
      */
-    public static function createPanicHistory($userData, $providerData, $requestData, $requestId)
+    public static function createPanicHistory($userData, $providerData, $requestData, $requestId, $ledgerId)
     {
         if (get_object_vars($userData)  && get_object_vars($providerData)  && get_object_vars($requestData)) {
 
-            $panicHistory = trans('panic::panic.user') . $userData->first_name . " " . $userData->last_name . trans('panic::panic.id') . $userData->id . trans('panic::panic.emergency_alert') .
-                $providerData->first_name . " " . $providerData->last_name . trans('panic::panic.id') . $requestId . trans('panic::panic.document')
-                . $providerData->document . trans('panic::panic.vehicle')
-                . $providerData->car_brand . " " . $providerData->car_model . " " . $providerData->car_color . " " . $providerData->car_number;
+            $ledgerData = Ledger::find($ledgerId);
+
+            if($ledgerData->user_id)
+                $panicHistory = trans('panic::panic.user') . $userData->first_name . " " . $userData->last_name . trans('panic::panic.id') . 
+                $userData->id . trans('panic::panic.emergency_alert') . $providerData->first_name . " " . 
+                $providerData->last_name . trans('panic::panic.id') . $providerData->id . trans('panic::panic.document') . 
+                $providerData->document . trans('panic::panic.vehicle') . $providerData->car_brand . " " . $providerData->car_model . " " . 
+                $providerData->car_color . " " . $providerData->car_number;
+            else
+                $panicHistory = trans('panic::panic.provider') . $providerData->first_name . " " . $providerData->last_name . trans('panic::panic.id') . 
+                $providerData->id . trans('panic::panic.emergency_alert_provider') . $userData->first_name . " " . 
+                $userData->last_name . trans('panic::panic.id') . $userData->id . trans('panic::panic.document') . 
+                $userData->document . trans('panic::panic.vehicle') . $providerData->car_brand . " " . $providerData->car_model . " " . 
+                $providerData->car_color . " " . $providerData->car_number;
             return $panicHistory;
         } else return $panicHistory = trans('panic::panic.panic_push_title');
     }

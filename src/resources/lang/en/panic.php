@@ -1,9 +1,11 @@
 <?php
 
 return array(
-    'user' => 'The user ',
+    'user' => 'The passager ',
+    'provider' => 'The driver ',
     'id' => ' with id ',
-    'emergency_alert' => ' has generated a panic alert during the ride with the provider ',
+    'emergency_alert' => ' has generated a panic alert during the ride with the driver ',
+    'emergency_alert_provider' => ' has generated a panic alert during the ride with the passager ',
     'email_text' => 'Please check the admin panel as soon as possible ',
     'document' => ' with document ',
     'vehicle' => ' in vehicle ',

@@ -1,9 +1,11 @@
 <?php
 
 return array(
-    'user' => 'O usuário ',
+    'user' => 'O passageiro ',
+    'provider' => 'O motorista ',
     'id' => ' com id ',
-    'emergency_alert' => ' gerou um Alerta de Emergência durante a corrida com o provedor ',
+    'emergency_alert' => ' gerou um Alerta de Emergência durante a corrida com o motorista ',
+    'emergency_alert_provider' => ' gerou um Alerta de Emergência durante a corrida com o passageiro ',
     'email_text' => 'Verifique o painel de email assim que possível',
     'document' => ' e documento ',
     'vehicle' => ' no veículo ',

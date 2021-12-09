@@ -167,6 +167,7 @@ class PanicUnitTest extends TestCase
             $fetchedPanicData->userData,
             $fetchedPanicData->providerData,
             $fetchedPanicData->requestData,
+            $ledgerId,
             $ledgerId
         );
 
@@ -175,12 +176,14 @@ class PanicUnitTest extends TestCase
 
     public function testWillNotCreatePanicHistory()
     {
+        $ledgerId = 1;
         $empty = new stdClass();
         $createdPanicHistory = PanicRepository::createPanicHistory(
             $empty,
             $empty,
             $empty,
-            0
+            0,
+            $ledgerId
         );
         $this->assertStringContainsString($createdPanicHistory, trans('panic::panic.panic_push_title'));
         $this->assertNotNull($createdPanicHistory);
@@ -282,10 +285,11 @@ class PanicUnitTest extends TestCase
     {
         $adminId = 1;
         $requestId = 1989;
+        $ledgerId = 1;
         $fetchedData =  PanicRepository::getPanicData(1989, 6);
         $this->assertIsObject($fetchedData);
         $panicInstance = new PanicController();
-        $panicMail = $panicInstance->sendMailForAdmin($adminId, $requestId, $fetchedData);
+        $panicMail = $panicInstance->sendMailForAdmin($adminId, $requestId, $fetchedData, $ledgerId);
         $this->assertIsBool($panicMail);
         $this->isTrue($panicMail);
     }
