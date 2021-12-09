@@ -219,13 +219,13 @@ class PanicRepository
 
             if($ledgerData->user_id)
                 $panicHistory = trans('panic::panic.user') . $userData->first_name . " " . $userData->last_name . trans('panic::panic.id') . 
-                $userData->id . trans('panic::panic.emergency_alert') . $providerData->first_name . " " . 
+                $userData->id . trans('panic::panic.emergency_alert', ['request_id' => $requestId]) . $providerData->first_name . " " . 
                 $providerData->last_name . trans('panic::panic.id') . $providerData->id . trans('panic::panic.document') . 
                 $providerData->document . trans('panic::panic.vehicle') . $providerData->car_brand . " " . $providerData->car_model . " " . 
                 $providerData->car_color . " " . $providerData->car_number;
             else
                 $panicHistory = trans('panic::panic.provider') . $providerData->first_name . " " . $providerData->last_name . trans('panic::panic.id') . 
-                $providerData->id . trans('panic::panic.emergency_alert_provider') . $userData->first_name . " " . 
+                $providerData->id . trans('panic::panic.emergency_alert_provider', ['request_id' => $requestId]) . $userData->first_name . " " . 
                 $userData->last_name . trans('panic::panic.id') . $userData->id . trans('panic::panic.document') . 
                 $userData->document . trans('panic::panic.vehicle') . $providerData->car_brand . " " . $providerData->car_model . " " . 
                 $providerData->car_color . " " . $providerData->car_number;
