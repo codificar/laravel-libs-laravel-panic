@@ -24,7 +24,7 @@
             <div class="card-outline-info">
                 <div class="card-header">
                     <h4 class="m-b-0 text-white">
-                        {{ trans("setting.panic_config") }}
+                        {{ trans("panic.panic_config") }}
                     </h4>
                 </div>
                 <div class="card-block">
@@ -32,7 +32,7 @@
                         <div class="col-lg-12">
                             <div class="panel-heading">
                                 <h3 class="panel-title">
-                                    {{ trans("setting.panic_general_config") }}
+                                    {{ trans("panic.panic_general_config") }}
                                 </h3>
                                 <hr />
                             </div>
@@ -49,7 +49,7 @@
                                         v-model="panic_settings.panic_button_enabled_user"
                                     />
                                     <label class="form-check-label" for="panic_button_enabled_user">{{
-                                        trans("setting.panic_button_enabled_user")
+                                        trans("panic.panic_button_enabled_user")
                                     }}</label>
                                 </div>
                             </div>
@@ -64,7 +64,7 @@
                                         v-model="panic_settings.panic_button_enabled_provider"
                                     />
                                     <label class="form-check-label" for="panic_button_enabled_provider">{{
-                                        trans("setting.panic_button_enabled_provider")
+                                        trans("panic.panic_button_enabled_provider")
                                     }}</label>
                                 </div>
                             </div>
