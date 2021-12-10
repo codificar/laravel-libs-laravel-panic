@@ -1,28 +1,24 @@
 <script>
+    export default {
+        props: [],
+        components: {
+        },
+        data() {
+            return {
+                panic_settings: {
+                    panic_button_enabled_user: false,
+                    panic_button_enabled_provider: false
+                },
+            };
+        },
+        methods: {
+        },
+        async mounted() {
 
-export default {
-    props: [],
-    components: {
-    },
-    data() {
-        return {
-            panic_settings: {
-                panic_button_enabled_user: false,
-                panic_button_enabled_provider: false
-            },
-        };
-    },
-    methods: {
-    },
-    async mounted() {
-
-    },
-};
+        },
+    };
 </script>
 <template>
-    <div>
-        <h1>Hello</h1>
-    </div>
     <div>
         <div class="tab-content">
             <div class="card-outline-info">

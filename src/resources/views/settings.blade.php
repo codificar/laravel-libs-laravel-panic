@@ -16,10 +16,9 @@
 @stop
 
 @section('content')
-	<div id="VueJs" class="col-sm-12">
+	<div id="VueJs">
 		
-		<panicsettings>
-		</panicsettings>
+		<panicsettings/>
 		
 	</div>
 @stop

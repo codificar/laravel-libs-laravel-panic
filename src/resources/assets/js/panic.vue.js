@@ -5,7 +5,7 @@ import Vue from 'vue';
 import Loading from 'vue-loading-overlay';
 import VueSweetalert2 from 'vue-sweetalert2';
 import pagination from 'laravel-vue-pagination';
-import panicsettings from './pages/panic_settings.vue';
+import PanicSettings from './pages/panic_settings.vue';
 
 Vue.use(VueSweetalert2);
 
@@ -20,7 +20,7 @@ new Vue({
     },
 
     components: {
-        panicsettings: panicsettings
+        panicsettings: PanicSettings
     },
 
     created: function () {
