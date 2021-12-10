@@ -24,6 +24,6 @@
 @stop
 
 @section('javascripts')
-<script src="/libs/panic/lang.trans/setting"> </script> 
+<script src="/libs/panic/lang.trans/panic"> </script> 
 <script src="{{ elixir('vendor/codificar/panic/panic.vue.js') }}"> </script> 
 @stop
