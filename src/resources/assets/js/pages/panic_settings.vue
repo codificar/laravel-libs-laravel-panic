@@ -24,9 +24,9 @@ export default {
         <div class="tab-content">
             <div class="card-outline-info">
                 <div class="card-header">
-                <h4 class="m-b-0 text-white">
-                    {{ trans("setting.panic_config") }}
-                </h4>
+                    <h4 class="m-b-0 text-white">
+                        {{ trans("setting.panic_config") }}
+                    </h4>
                 </div>
                 <div class="card-block">
                     <div class="row">
