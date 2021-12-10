@@ -21,6 +21,9 @@ export default {
 </script>
 <template>
     <div>
+        <h1>Hello</h1>
+    </div>
+    <div>
         <div class="tab-content">
             <div class="card-outline-info">
                 <div class="card-header">
