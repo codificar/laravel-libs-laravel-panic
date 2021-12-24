@@ -28,7 +28,7 @@ class PanicSettingAdminRequest extends FormRequest
         return [
             'panic_admin_email' => 'required|string',
             'panic_admin_phone_number' => 'required|string',
-            'panic_admin_id' => 'required|string',
+            'panic_admin_id' => 'required',
         ];
     }
 

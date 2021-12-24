@@ -586,14 +586,14 @@ class PanicRepository
     //TODO: change trans 
     /**
      * This function fetches the admin id from the settings table from the DB then returns it
-     * @return string $adminMail
+     * @return int $adminMail
      */
     public static function getPanicAdminId()
     {
         $adminId = Settings::getPanicAdminId();
         if ($adminId != null) {
             return $adminId;
-        } else return trans('panic::no_admin_phone');
+        } else return null;
     }
 
     /**
@@ -608,4 +608,12 @@ class PanicRepository
             \Log::error($e->getMessage());
         }
     }
+
+	/**
+	 * recupera todos os admins cadastrados para configurar
+	 * @return Array
+	 */
+	public static function getAdmins() {
+		return Admin::where('profile_id', 1)->where('is_active', 1)->get(['id', 'username']);
+	}
 };

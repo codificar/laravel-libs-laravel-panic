@@ -14,6 +14,8 @@ Route::group(['prefix' => '/lib/panic'], function () {
 
     Route::get('/', 'PanicController@index');
 
+	Route::get('/admins', 'Codificar\Panic\Http\PanicController@getAdminsToSettingsPage');
+
     //create route to save the admin data that is needed
     //create request validating the needed data 
     //create the needed data in the settings model

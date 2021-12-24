@@ -433,4 +433,10 @@ class PanicController extends Controller
         curl_close($curl);
         return $decodedResponse;
     }
+
+	public function getAdminsToSettingsPage() {
+		$admins = PanicRepository::getAdmins();
+
+		return response()->json($admins);
+	}
 }
