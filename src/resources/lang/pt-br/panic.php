@@ -25,5 +25,41 @@ return array(
     'no_segup_password' => 'Não há senha da SEGUP registrada no banco de dados',
     'no_segup_url' => 'Não há url da SEGUP registrada no banco de dados',
     'no_segup_verification_url' => 'Não há url de verificação de token da SEGUP registrada no banco de dados',
-    'push_no_ledger' => 'Contato não encontrado para envio de notificação'
+    'push_no_ledger' => 'Contato não encontrado para envio de notificação',
+	'panic_button' => 'Botão de pânico',
+
+	//palavras chaves
+	'yes' => 'Sim',
+	'no' => 'Não',
+	'save' => 'Salvar',
+
+	//settings
+	'panic_config' => 'Configurações do botão de pânico',
+
+	'panic_general_config' => 'Configurações gerais',
+	'panic_button_enabled_user' => 'Habilitar para o usuário?',
+	'panic_button_enabled_driver' => 'Habilitar para o motorista?',
+
+	//configurações segup
+	'panic_segup_config' => 'Configurações SEGUP',
+	'segup_login' => 'Login SEGUP',
+	'segup_password' => 'Senha SEGUP',
+	'segup_request_url' => 'URL de requisição SEGUP',
+	'segup_verification_url' => 'URL de verificação SEGUP',
+
+	//Configurações do administrador
+	'panic_admin_config' => 'Configurações do Administrador',
+	'admin' => 'Selecione o administrador',
+	'admin_phone' => 'Telefone do administrador',
+
+	//Relatório pânico
+	'filters' => 'Filtros',
+	'filter' => 'Filtrar',
+	'request_id' => 'Id da corrida',
+	'panic_user' => 'Usuário',
+	'panic_provider' => 'Motorista',
+	'panic_id' => 'Id',
+	'history' => 'Mensagem',
+	'data' => 'Data/Horário',
+
 );

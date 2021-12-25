@@ -22,6 +22,7 @@ use Codificar\Panic\Http\Resources\PanicGettingAdminResource;
 use Codificar\Panic\Http\Resources\IndexResource;
 use Codificar\Panic\Repositories\PanicRepository;
 
+use Illuminate\Http\Request;
 
 class PanicController extends Controller
 {
@@ -434,9 +435,30 @@ class PanicController extends Controller
         return $decodedResponse;
     }
 
+	/**
+     * recupera todos os admins cadastrados para tela de configurações da lib 
+     * @api {GET}/lib/panic/admins
+     * @return Json
+     */
 	public function getAdminsToSettingsPage() {
 		$admins = PanicRepository::getAdmins();
 
 		return response()->json($admins);
 	}
+
+	/**
+     * Get the report of request panic
+     * @api {GET} /lib/panic/panic_report
+     * @param Request $request
+     * @return RequestHelpListResource
+     */
+    public function fetch(Request $request)
+    {		
+        return new IndexResource([
+            'panic' => PanicRepository::fetch(
+                $request->page,
+                json_decode($request->filter)
+            )
+        ]);
+    }
 }

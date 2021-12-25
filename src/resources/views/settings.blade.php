@@ -9,7 +9,7 @@
 			
 			<ol class="breadcrumb">
 				<li class="breadcrumb-item"><a href="javascript:void(0)">{{ trans('settingsTrans::setting.home') }}</a></li>
-				<li class="breadcrumb-item active">{{ trans('settingsTrans::setting.panic') }}</li>
+				<li class="breadcrumb-item active">{{ trans('panic::panic.panic_button') }}</li>
 			</ol>
 		</div>
 	</div>	
@@ -22,7 +22,6 @@
 @stop
 
 @section('javascripts')
-	<script src="{{ elixir('vendor/codificar/reasons-request/reasons.vue.js') }}"> </script>
-
+	<script src="/libs/panic/lang.trans/panic"> </script> 
 	<script src="{{ elixir('vendor/codificar/panic/panic.vue.js') }}"> </script> 
 @stop

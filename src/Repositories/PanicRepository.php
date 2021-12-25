@@ -14,6 +14,8 @@ use RequestLocation;
 use stdClass;
 use Codificar\Panic\Models\Panic;
 
+use Illuminate\Support\Facades\DB;
+use Illuminate\Pagination\Paginator;
 
 class PanicRepository
 {
@@ -610,10 +612,89 @@ class PanicRepository
     }
 
 	/**
-	 * recupera todos os admins cadastrados para configurar
+	 * recupera todos os admins cadastrados para tela de configurações da lib
 	 * @return Array
 	 */
 	public static function getAdmins() {
 		return Admin::where('profile_id', 1)->where('is_active', 1)->get(['id', 'username']);
 	}
+
+	/**
+     * Query to search registers
+     */
+    public static function search(
+        $requestId = '',
+        $user_ledgerId = '',
+        $provider_ledgerId = ''
+    ) {
+        $query = Panic::query();
+        $query = $query->leftJoin(
+            'request as r', 
+            'panic.request_id', '=', 'r.id'
+        )->leftJoin(
+			'user as u',
+			'r.user_id', '=', 'u.id'
+        )->leftJoin(
+			'provider as p',
+			'r.current_provider', '=', 'p.id'
+        )->leftJoin(
+			'ledger as l',
+			'panic.ledger_id', '=', 'l.id'
+        );
+
+        if ($requestId)
+            $query = $query->where('r.id', $requestId);
+
+        if ($user_ledgerId)
+            $query = $query->where('l.id', $user_ledgerId);
+
+        if ($provider_ledgerId)
+            $query = $query->where('l.id', $provider_ledgerId);
+
+		return $query->select(
+            'panic.id',
+            'request_id',
+            'panic.created_at as date',
+			'panic.history',
+            DB::raw("CONCAT(u.first_name,' ',u.last_name) AS user_name"),
+            DB::raw("CONCAT(p.first_name,' ',p.last_name) AS provider_name")
+        );
+    }
+
+	/**
+     * Fetch and paginate registers
+     * @param int $page
+     * @param object $filter
+     * @return array
+     */
+    public static function fetch($page, $filter)
+    {
+        $recordsTotal = Panic::whereNotNull('id')->count();
+		
+		if (isset($filter->user_id)) {
+			$user_ledger = Ledger::where('user_id', $filter->user_id)->first();
+		}
+
+		if (isset($filter->provider_id)) {
+			$provider_ledger = Ledger::where('provider_id', $filter->provider_id)->first();
+		}
+
+		$data = self::search(
+            isset($filter->request_id) ? $filter->request_id : null,
+            isset($user_ledger->id) ? $user_ledger->id : null,
+            isset($provider_ledger->id) ?  $provider_ledger->id : null
+        );
+
+        $currentPage = $page;
+
+		Paginator::currentPageResolver(function () use ($currentPage) {
+			return $currentPage;
+        });
+
+        return [
+			'records_total' => $recordsTotal,
+			'records_filtered' => $data->count(),
+			'panic' => $data->paginate(10)
+		];
+    }
 };

@@ -21,8 +21,8 @@
 						</label>
 
 						<select class="form-control" v-model="general_settings.panic_button_enabled_user">
-							<option value="true">{{ trans('setting.yes') }}</option>
-							<option value="false">{{ trans('setting.no') }}</option>
+							<option value="true">{{ trans('panic.yes') }}</option>
+							<option value="false">{{ trans('panic.no') }}</option>
 						</select>
 					</div>
 
@@ -34,8 +34,8 @@
 						</label>
 
 						<select class="form-control" v-model="general_settings.panic_button_enabled_provider">
-							<option value="true">{{ trans('setting.yes') }}</option>
-							<option value="false">{{ trans('setting.no') }}</option>
+							<option value="true">{{ trans('panic.yes') }}</option>
+							<option value="false">{{ trans('panic.no') }}</option>
 						</select>
 					</div>
 				</div><br>
@@ -119,7 +119,7 @@
 				<div class="form-group text-right button-save">
 					<button type="button" class="btn btn-success" @click="saveSettings">
 						<span class="glyphicon glyphicon-floppy-disk" aria-hidden="true">
-							{{ trans('keywords.save') }}
+							{{ trans('panic.save') }}
 						</span>
 					</button>
 				</div>

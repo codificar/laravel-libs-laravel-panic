@@ -15,11 +15,8 @@ class IndexResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'id' => $this->id,
-            'request_id' => $this->request_id,
-            'ledger_id' => $this->ledger_id,
-            'admin_id' => $this->admin_id,
-            'history' => $this->history,
+            'success' => true,
+            'panic' => $this['panic']
         ];
     }
 }
