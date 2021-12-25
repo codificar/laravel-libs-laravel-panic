@@ -450,7 +450,7 @@ class PanicController extends Controller
      * Get the report of request panic
      * @api {GET} /lib/panic/panic_report
      * @param Request $request
-     * @return RequestHelpListResource
+     * @return IndexResource
      */
     public function fetch(Request $request)
     {		
