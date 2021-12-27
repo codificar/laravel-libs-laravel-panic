@@ -13,9 +13,9 @@ class RunPanicRequestEmailSeeder extends Migration
     {
         EmailTemplate::updateOrCreate(['key' => 'panic_request'], [
             'key' => 'panic_request',
-            'subject' => '',
-            'copy_emails' => Settings::getPanicAdminEmail(),
-            'from' => Settings::getPanicAdminEmail()
+            'subject' => 'Notificação de pânico',
+            'copy_emails' => Settings::getAdminEmail(),
+            'from' => Settings::getAdminEmail()
         ]);
     
         $template = EmailTemplate::where('key', 'panic_request')->first();
