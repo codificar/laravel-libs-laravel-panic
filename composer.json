@@ -1,30 +1,57 @@
 {
-    "name": "codificar/laravel-panic",
+    "name": "codificar/panic",
     "description": "This lib provides the backend feature to allow the users and providers to send a distress call to the admin and the registered emergency contacts",
     "type": "package",
     "authors": [
         {
-            "name": "Codificar",
+            "name": "Ricardo Cavalcanti",
             "email": "libs@codificar.com.br"
+        },
+        {
+            "name": "Luiz Antunes",
+            "email": "luiz.antunes@codificar.com.br"
+        },
+        {
+            "name": "Raphael Canguçu",
+            "email": "raphael.cangucu@codificar.com.br"
         }
     ],
-    "prefer-stable": true,
-    "minimum-stability": "dev",
+    "require": {
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.0"
+    },
+    "repositories": [
+        {
+          "type": "package",
+          "package": {
+            "name": "codificar/panic",
+            "version": "master",
+            "source": {
+              "url": "https://libs:ofImhksJ@git.codificar.com.br/laravel-libs/laravel-panic.git",
+              "type": "git",
+              "reference": "master"
+            }
+          }
+        }
+    ],   
     "autoload": {
         "psr-4": {
             "Codificar\\Panic\\": "src/",
             "Tests\\": "tests/"
         }
     },
-    "autoload-dev": {
-        "psr-4": {
-            "Codificar\\Panic\\": "src/"
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Codificar\\Panic\\PanicServiceProvider"
+            ]
         }
     },
-    "require": {
-        "guzzlehttp/guzzle": "~6.0"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "^7.0"
-    }
+    "minimum-stability": "dev"
 }

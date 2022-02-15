@@ -25,7 +25,7 @@ Route::get('/libs/panic/lang.trans/{file}', function () {
         $strings[$name] = require $file;
     }
 
-    header('Content-Type: text/javascript');
-    return ('window.lang = ' . json_encode($strings) . ';');
-    exit();
+    return response('window.lang = ' . json_encode($strings) . ';')
+            ->header('Content-Type', 'text/javascript');
+
 })->name('assets.lang');

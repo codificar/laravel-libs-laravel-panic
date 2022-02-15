@@ -10,70 +10,69 @@ Lib para executar requisições de pânico para as secretarias de segurança ind
 
 Adicione o pacote no composer.json:
 
-```
+
+```json
 "repositories": [
-{
-"type": "package",
-"package": {
-"name": "codificar/laravel-panic",
-"version": "master",
-"source": {
-"url": "https://libs:ofImhksJ@git.codificar.com.br/laravel-libs/laravel-panic.git",
-"type": "git",
-"reference": "master"
-}
-}
-}
-],
+    {
+        "type": "vcs",
+        "url": "https://libs:ofImhksJ@git.codificar.com.br/laravel-libs/laravel-panic.git"
+    }
+]
 ```
 
+
+```json
+require:{
+        "codificar/panic": "0.1.0",
+}
 ```
-"require": {
-// ADD this
-"codificar/laravel-panic": "dev-master",
-},
-```
+
 
 Agora Adicione no Autoload do Composer.json
 
-```
+```json
     "autoload": {
         //...
         "psr-4": {
-    		"Codificar\\Panic\\": "vendor/codificar/laravel-panic/src",
-    		"Codificar\\Panic\\Tests\\": "vendor/codificar/laravel-panic/tests/"
+    		"Codificar\\Panic\\": "vendor/codificar/panic/src",
+    		"Codificar\\Panic\\Tests\\": "vendor/codificar/panic/tests/"
             //...
         }
     },
 ```
 
-Execute
+Update project dependencies:
 
-```
-composer dump-autoload -o
+```shell
+$ composer update
 ```
 
-Adicione a Classe no como Provider
 
-```
+Register the service provider in `config/app.php`:
+
+```php
 'providers' => [
-...,
-// The new package class
-Codificar\Panic\PanicServiceProvider::class,
+  /*
+   * Package Service Providers...
+   */
+  Codificar\Panic\PanicServiceProvider::class,
 ],
 ```
 
-Execute as migrations
 
-```
-php artisan migrate
+Publish Js Libs and Tests:
+
+```shell
+$ php artisan vendor:publish --tag=public_vuejs_libs --force
 ```
 
-Execute o artisan serve
 
+Run the migrations:
+
+```shell
+$ php artisan migrate
 ```
-php artisan serve
-```
+
 
 ---
 

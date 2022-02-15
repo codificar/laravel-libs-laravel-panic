@@ -33,7 +33,7 @@ Vue.use(Toasted);
 
 //Main vue instance
 new Vue({
-    el: '#VueJs',
+    el: '#panic',
 
     data: {
     },

@@ -1,3 +1,4 @@
 {
-    "/public/js/panic.vue.js": "/public/js/panic.vue.js"
+    "/public/js/panic.vue.js": "/public/js/panic.vue.js",
+    "/public/vendor/codificar/panic/panic.vue.js": "/public/vendor/codificar/panic/panic.vue.js"
 }

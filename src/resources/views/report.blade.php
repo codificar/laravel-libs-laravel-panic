@@ -14,13 +14,13 @@
 @stop
 
 @section('content')
-	<div id="VueJs">
+	<div id="panic">
 		<panicreport/>		
 	</div>
 @stop
 
 @section('javascripts')
 	<script src="/libs/panic/lang.trans/panic"> </script> 
-	<script src="{{ elixir('vendor/codificar/panic/panic.vue.js') }}"> </script> 
+	<script src="{{ asset('vendor/codificar/panic/panic.vue.js') }}"> </script> 
 @stop
 
