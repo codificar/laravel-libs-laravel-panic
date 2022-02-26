@@ -2,13 +2,11 @@
 
 namespace Codificar\Panic\Models;
 
-
 use Illuminate\Database\Eloquent\Model;
-use SebastianBerc\Repositories\Traits\Sortable;
 
 class Panic extends Model
 {
-    use Sortable;
+
 
     protected $table = 'panic';
 
@@ -36,12 +34,6 @@ class Panic extends Model
         'history' => '',
     ];
 
-    public $sortable = [
-        'ledger_id',
-        'request_id',
-        'admin_id',
-        'history',
-    ];
 
     protected $casts = [
         'id' => 'int',

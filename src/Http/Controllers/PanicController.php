@@ -1,6 +1,6 @@
 <?php
 
-namespace Codificar\Panic\Http;
+namespace Codificar\Panic\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Settings;
@@ -34,7 +34,7 @@ class PanicController extends Controller
      */
     public function indexSorting()
     {
-        $panics = Panic::paginate(10);
+        $panics = Panic::paginate(100);
         return view('laravel-panic::report')->with('panics', $panics);
     }
 
