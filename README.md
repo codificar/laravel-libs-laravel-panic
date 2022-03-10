@@ -23,7 +23,7 @@ Adicione o pacote no composer.json:
 
 ```json
 require:{
-        "codificar/panic": "0.1.0",
+        "codificar/panic": "0.0.1",
 }
 ```
 
