@@ -619,7 +619,7 @@ class PanicRepository
 	 * @return Array
 	 */
 	public static function getAdmins() {
-		return Admin::where('profile_id', 1)->where('is_active', 1)->get(['id', 'username']);
+		return Admin::where('type', 'admin')->where('is_active', 1)->get(['id', 'username']);
 	}
 
 	/**
