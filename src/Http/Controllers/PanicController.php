@@ -278,16 +278,49 @@ class PanicController extends Controller
      */
     public function sendMailForEmergencyContacts($ledgerId, $fetchedData, $requestId)
     {
-        $type = 'ledger_contacts';
-        $vars = PanicRepository::createPanicHistory($fetchedData->userData, $fetchedData->providerData, $fetchedData->requestData, $requestId, $ledgerId);
-        $subject = trans('panic::panic.panic_email_subject');
-        $is_imp = 1;
+        $logo = asset_url() . \Theme::getLogoUrl();
 
-        try {
-            $emailForEmergencyContacts = email_notification($ledgerId, $type, $vars, $subject, $is_imp);
-            return $emailForEmergencyContacts;
-        } catch (\Exception $e) {
-            \Log::error($e->getMessage());
+        $ledgerData = \Ledger::find($ledgerId);
+        if($ledgerData->user_id) {
+            $helped = \User::where('id', $ledgerData->user_id)->first();
+        } else {
+            $helped = \Provider::where('id', $ledgerData->provider_id)->first();
+        }
+
+        $ride = \Requests::where('id', $requestId)->first();
+
+        $vars = array(
+            'logo' => $logo,
+            'request_id'    =>  $requestId , 
+            'ledger_name'   =>  $helped->first_name . ' ' . $helped->last_name,
+            'latitude'      =>  $fetchedData->providerData['latitude'],
+            'longitude'     =>  $fetchedData->providerData['longitude'],
+            'provider_name' =>  $fetchedData->providerData['first_name'] . " " . $fetchedData->providerData['last_name'],
+            'car_plate'     =>  $fetchedData->providerData['car_number'],
+            'car_model'     =>  $fetchedData->providerData['car_brand'],
+            'user_name'     =>  $fetchedData->userData['first_name'] . " " . $fetchedData->userData['last_name'],
+            'user_phone'    =>  $fetchedData->userData['phone'],
+            'source_address'=>  $ride->src_address,
+            'dest_address'  =>  $ride->dest_address,
+            'tracking_url'  =>  $ride->tracking_url
+        );
+
+        $title   = trans('ledgerContacts.push_title');
+
+        $contacts = \LedgerContact::findById($ledgerId);
+        foreach($contacts as $contact)
+        {
+            if($contact->contact_id && $contact->status == \LedgerContact::STATUS[1])
+            {
+                // Send SMS
+                $ledger = \Ledger::find($contact->contact_id);
+
+                if(isset($ledger) && $ledger['user_id']) {
+                    email_notification($ledger['user_id'], 'user', $vars, $title, 'send_emergency_email');
+                }else if(isset($ledger) && $ledger['provider_id']){
+                    email_notification($ledger['provider_id'], 'provider', $vars, $title, 'send_emergency_email');
+                }
+            }
         }
     }
 

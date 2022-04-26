@@ -122,7 +122,8 @@ class PanicRepository
             $userData = User::where('id', $userId)->firstOrFail([
                 'id',
                 'first_name',
-                'last_name'
+                'last_name',
+                'phone'
             ]);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
@@ -147,7 +148,9 @@ class PanicRepository
                 'car_brand',
                 'car_model',
                 'car_color',
-                'car_number'
+                'car_number',
+                'latitude',
+                'longitude'
             ]);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
