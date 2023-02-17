@@ -1,7 +1,7 @@
 <?php
 
 Route::group(['prefix' => '/lib/panic'], function () {
-    Route::get('/view/report', 'Codificar\Panic\Http\Controllers\PanicController@indexSorting');
+    Route::get('/view/report', 'Codificar\Panic\Http\Controllers\PanicController@indexSorting')->name('libPanicReport');
 	Route::get('/view/fetch', 'Codificar\Panic\Http\Controllers\PanicController@fetch');
 
     Route::get('/view/settings', function () {
