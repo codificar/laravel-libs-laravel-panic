@@ -5,6 +5,7 @@ namespace Codificar\Panic\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Settings;
 use Carbon\Carbon;
+use Codificar\Chat\Events\EventNewPanicMessageNotification;
 use Codificar\Panic\Models\Panic;
 use Codificar\Panic\Http\Resources\PanicDeletedResource;
 use Codificar\Panic\Http\Resources\PanicSuccessfulResource;
@@ -21,7 +22,6 @@ use Codificar\Panic\Http\Resources\PanicSettingAdminResource;
 use Codificar\Panic\Http\Resources\PanicGettingAdminResource;
 use Codificar\Panic\Http\Resources\IndexResource;
 use Codificar\Panic\Repositories\PanicRepository;
-
 use Illuminate\Http\Request;
 
 class PanicController extends Controller
@@ -62,12 +62,17 @@ class PanicController extends Controller
             $this->sendSmsForEmergencyContacts($ledgerId);
             $this->sendPushToEmergencyContacts($ledgerId);
         }
+        try {
+            event(new EventNewPanicMessageNotification());
+        } catch(\Exception $e) {
+            \Log::warning($e->getMessage() . $e->getTraceAsString());
+        }
         $security_agency = PanicRepository::getSecurityProviderAgency();
         //to include other api calls to third party security agencies include it into the if block below
         //you need to create the functions that will call that 3rd party api then include the resource in the next 
         if ($security_agency == 'segup') {
             $securityProviderApiCall = $this->callSegupApi($fetchedData->providerData, $fetchedData->requestData);
-            if ($securityProviderApiCall->idposicao) {
+            if ($securityProviderApiCall && $securityProviderApiCall->idposicao) {
                 return new PanicSuccessfulResource($panicModel);
             } else {
                 return new PanicOnlyCreatedResource($panicModel);
@@ -391,7 +396,7 @@ class PanicController extends Controller
     public static function verifySegupToken()
     {
         $timestamp = Settings::getSegupTokenExpirationTimestamp();
-        if ($timestamp = 'No Timestamp' || $timestamp != Carbon::today()) {
+        if ($timestamp == 'No Timestamp' || $timestamp != Carbon::today()) {
             $url = Settings::getSegupVerificationUrl();
             $login = Settings::getSegupLogin();
             $password = Settings::getSegupPassword();
@@ -402,7 +407,7 @@ class PanicController extends Controller
                 'expire' => 1000
             ];
             $postFieldsUnencoded = http_build_query($encodedRequestBody);
-
+            
             $curl = curl_init();
 
             curl_setopt_array($curl, array(
@@ -423,9 +428,12 @@ class PanicController extends Controller
             $response = curl_exec($curl);
             $decodedResponse = json_decode($response);
             curl_close($curl);
-            $timestamp = Settings::saveSegupTokenExpirationTimestamp();
-            $savedToken = Settings::saveSegupToken($decodedResponse->token);
-            return $savedToken->value;
+            if($decodedResponse && $decodedResponse->token) {
+                $timestamp = Settings::saveSegupTokenExpirationTimestamp();
+                $savedToken = Settings::saveSegupToken($decodedResponse->token);
+                return $savedToken->value;
+            }
+            return Settings::getSegupToken();
         } else {
             $savedToken = Settings::getSegupToken();
             return $savedToken;
@@ -443,6 +451,9 @@ class PanicController extends Controller
     public function callSegupApi($providerData, $requestData)
     {
         $token = $this->verifySegupToken();
+        if(!$token) {
+            return false;
+        }
         $url = Settings::getSegupRequestUrl();
         $createdRequestBody = PanicRepository::createSegupRequestBody($providerData, $requestData);
         $unencodedRequestBody = http_build_query($createdRequestBody);

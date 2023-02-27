@@ -60,4 +60,19 @@ class Panic extends Model
     {
         return $this->belongsTo('Admin', 'admin_id', 'id');
     }
+
+    /**
+     * Set panic messa to is seen
+     * 
+     * @return void
+     */
+    public function setSeen()
+    {
+        try {
+            $this->is_seen = true;
+            $this->save();
+        } catch(\Exception $e) {
+            \Log::error($e->getMessage() . $e->getTraceAsString());
+        }
+    }
 }
