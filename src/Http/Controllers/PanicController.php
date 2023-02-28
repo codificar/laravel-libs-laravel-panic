@@ -21,6 +21,7 @@ use Codificar\Panic\Http\Resources\PanicSettingSegupResource;
 use Codificar\Panic\Http\Resources\PanicSettingAdminResource;
 use Codificar\Panic\Http\Resources\PanicGettingAdminResource;
 use Codificar\Panic\Http\Resources\IndexResource;
+use Codificar\Panic\Http\Resources\PanicErrorResource;
 use Codificar\Panic\Repositories\PanicRepository;
 use Illuminate\Http\Request;
 
@@ -53,6 +54,12 @@ class PanicController extends Controller
         $requestId = $request->request_id;
         $ledgerId = $request->ledger_id;
         $fetchedData = PanicRepository::getPanicData($requestId);
+        
+        if(!$fetchedData) {
+            \Log::error(__METHOD__ . ' - line: ' . __LINE__ . ' - Failed to create Panic [$fetchedData]');
+            return new PanicErrorResource([]);
+        }
+
         $adminId = $fetchedData->adminData->adminId;
         $panicModel = PanicRepository::insertPanicRequestToTable($requestId, $ledgerId, $adminId, $fetchedData);
         if (get_object_vars($panicModel)) {
