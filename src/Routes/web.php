@@ -9,6 +9,11 @@ Route::group(['prefix' => '/lib/panic'], function () {
     });
 });
 
+Route::group(['prefix' => '/admin/lib'], function() {
+    Route::get('/panic-notification', 'PanicController@getPanicMessagesNotification')->name('libAdminPanicMessagesNotifications');
+    Route::get('/panic/see/{panicId}', 'PanicController@adminPanicSee')->name('libPanicSee');
+});
+
 /**
  * Rota para permitir utilizar arquivos de traducao do laravel (dessa lib) no vue js
  */

@@ -5,7 +5,8 @@ namespace Codificar\Panic\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Settings;
 use Carbon\Carbon;
-use Codificar\Chat\Events\EventNewPanicMessageNotification;
+use Codificar\Panic\Http\Requests\PanicSeenFormRequest;
+use Codificar\Panic\Events\EventNewPanicMessageNotification;
 use Codificar\Panic\Models\Panic;
 use Codificar\Panic\Http\Resources\PanicDeletedResource;
 use Codificar\Panic\Http\Resources\PanicSuccessfulResource;
@@ -21,6 +22,7 @@ use Codificar\Panic\Http\Resources\PanicSettingSegupResource;
 use Codificar\Panic\Http\Resources\PanicSettingAdminResource;
 use Codificar\Panic\Http\Resources\PanicGettingAdminResource;
 use Codificar\Panic\Http\Resources\IndexResource;
+use Codificar\Panic\Http\Resources\MessagesPanicTodayResource;
 use Codificar\Panic\Http\Resources\PanicErrorResource;
 use Codificar\Panic\Repositories\PanicRepository;
 use Illuminate\Http\Request;
@@ -511,5 +513,28 @@ class PanicController extends Controller
                 json_decode($request->filter)
             )
         ]);
+    }
+
+    /**
+     * Get all panic messages notification
+     * 
+     * @return Json
+     */
+    public function getPanicMessagesNotification(PanicRepository $message) 
+    {
+        return new MessagesPanicTodayResource($message->getAllMessagesPanicToday());
+    }
+
+    /**
+     * Set panic message to is seen and redirect to report panic messages
+     * @param PanicSeenFormRequest $request
+     * @return RedirectResponse
+     */
+    public function adminPanicSee(PanicSeenFormRequest $request)
+    {
+        $request->panic->setSeen();
+        event(new EventNewPanicMessageNotification());
+        return redirect()->route('libPanicReport');
+
     }
 }
