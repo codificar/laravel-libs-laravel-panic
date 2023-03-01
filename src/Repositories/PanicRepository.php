@@ -8,7 +8,6 @@ use Settings;
 use User;
 use Admin;
 use Codificar\Panic\Models\Messages;
-use Codificar\Panic\Interfaces\PanicRepositoryInterface;
 use Ledger;
 use LedgerContact;
 use Provider;
@@ -19,7 +18,7 @@ use Codificar\Panic\Models\Panic;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Pagination\Paginator;
 
-class PanicRepository implements PanicRepositoryInterface
+class PanicRepository
 {
     /**
      * This function inserts the Panic Request on to the Panic table
