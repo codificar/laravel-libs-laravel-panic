@@ -9,9 +9,9 @@ Route::group(['prefix' => '/lib/panic'], function () {
     });
 });
 
-Route::group(['prefix' => '/admin/lib'], function() {
-    Route::get('/panic-notification', 'PanicController@getPanicMessagesNotification')->name('libAdminPanicMessagesNotifications');
-    Route::get('/panic/see/{panicId}', 'PanicController@adminPanicSee')->name('libPanicSee');
+Route::group(['prefix' => '/admin/lib/panic'], function() {
+    Route::get('/notification', 'Codificar\Panic\Http\Controllers\PanicController@getPanicMessagesNotification')->name('libAdminPanicMessagesNotifications');
+    Route::get('/see/{panicId}', 'Codificar\Panic\Http\Controllers\PanicController@adminPanicSee')->name('libPanicSee');
 });
 
 /**
