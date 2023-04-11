@@ -75,4 +75,19 @@ class Panic extends Model
             \Log::error($e->getMessage() . $e->getTraceAsString());
         }
     }
+
+    /**
+     * Set all panic messa to is seen
+     * 
+     * @return void
+     */
+    public static function setAllSeen()
+    {
+        try {
+            self::where(['is_seen' => false])
+            ->update(['is_seen' => true]);
+        } catch(\Exception $e) {
+            \Log::error($e->getMessage() . $e->getTraceAsString());
+        }
+    }
 }

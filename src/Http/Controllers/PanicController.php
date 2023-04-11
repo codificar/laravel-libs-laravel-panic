@@ -35,8 +35,12 @@ class PanicController extends Controller
      * @api {get} /lib/panic/
      * @return resource indexResource
      */
-    public function indexSorting()
+    public function indexSorting(Request $request)
     {
+        if($request->has('read-all')) {
+            Panic::setAllSeen();
+            event(new EventNewPanicMessageNotification());
+        }
         $panics = Panic::paginate(100);
         return view('laravel-panic::report')->with('panics', $panics);
     }
