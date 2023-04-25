@@ -12,5 +12,6 @@ let mix = require('laravel-mix');
  */
 
 mix.js('src/resources/assets/js/panic.vue.js', 'public/js').vue();
+mix.js('src/resources/assets/js/notificationPanic.vue.js', 'public/js').vue();
 
 mix.copy('public/js/panic.vue.js', '../../../public/vendor/codificar/panic/panic.vue.js');

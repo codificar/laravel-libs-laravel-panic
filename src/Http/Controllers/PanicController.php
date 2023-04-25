@@ -5,6 +5,8 @@ namespace Codificar\Panic\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Settings;
 use Carbon\Carbon;
+use Codificar\Panic\Http\Requests\PanicSeenFormRequest;
+use Codificar\Panic\Events\EventNewPanicMessageNotification;
 use Codificar\Panic\Models\Panic;
 use Codificar\Panic\Http\Resources\PanicDeletedResource;
 use Codificar\Panic\Http\Resources\PanicSuccessfulResource;
@@ -20,8 +22,9 @@ use Codificar\Panic\Http\Resources\PanicSettingSegupResource;
 use Codificar\Panic\Http\Resources\PanicSettingAdminResource;
 use Codificar\Panic\Http\Resources\PanicGettingAdminResource;
 use Codificar\Panic\Http\Resources\IndexResource;
+use Codificar\Panic\Http\Resources\MessagesPanicTodayResource;
+use Codificar\Panic\Http\Resources\PanicErrorResource;
 use Codificar\Panic\Repositories\PanicRepository;
-
 use Illuminate\Http\Request;
 
 class PanicController extends Controller
@@ -32,8 +35,12 @@ class PanicController extends Controller
      * @api {get} /lib/panic/
      * @return resource indexResource
      */
-    public function indexSorting()
+    public function indexSorting(Request $request)
     {
+        if($request->has('read-all')) {
+            Panic::setAllSeen();
+            event(new EventNewPanicMessageNotification());
+        }
         $panics = Panic::paginate(100);
         return view('laravel-panic::report')->with('panics', $panics);
     }
@@ -53,6 +60,12 @@ class PanicController extends Controller
         $requestId = $request->request_id;
         $ledgerId = $request->ledger_id;
         $fetchedData = PanicRepository::getPanicData($requestId);
+        
+        if(!$fetchedData) {
+            \Log::error(__METHOD__ . ' - line: ' . __LINE__ . ' - Failed to create Panic [$fetchedData]');
+            return new PanicErrorResource([]);
+        }
+
         $adminId = $fetchedData->adminData->adminId;
         $panicModel = PanicRepository::insertPanicRequestToTable($requestId, $ledgerId, $adminId, $fetchedData);
         if (get_object_vars($panicModel)) {
@@ -62,12 +75,17 @@ class PanicController extends Controller
             $this->sendSmsForEmergencyContacts($ledgerId);
             $this->sendPushToEmergencyContacts($ledgerId);
         }
+        try {
+            event(new EventNewPanicMessageNotification());
+        } catch(\Exception $e) {
+            \Log::warning($e->getMessage() . $e->getTraceAsString());
+        }
         $security_agency = PanicRepository::getSecurityProviderAgency();
         //to include other api calls to third party security agencies include it into the if block below
         //you need to create the functions that will call that 3rd party api then include the resource in the next 
         if ($security_agency == 'segup') {
             $securityProviderApiCall = $this->callSegupApi($fetchedData->providerData, $fetchedData->requestData);
-            if ($securityProviderApiCall->idposicao) {
+            if ($securityProviderApiCall && $securityProviderApiCall->idposicao) {
                 return new PanicSuccessfulResource($panicModel);
             } else {
                 return new PanicOnlyCreatedResource($panicModel);
@@ -391,7 +409,7 @@ class PanicController extends Controller
     public static function verifySegupToken()
     {
         $timestamp = Settings::getSegupTokenExpirationTimestamp();
-        if ($timestamp = 'No Timestamp' || $timestamp != Carbon::today()) {
+        if ($timestamp == 'No Timestamp' || $timestamp != Carbon::today()) {
             $url = Settings::getSegupVerificationUrl();
             $login = Settings::getSegupLogin();
             $password = Settings::getSegupPassword();
@@ -402,7 +420,7 @@ class PanicController extends Controller
                 'expire' => 1000
             ];
             $postFieldsUnencoded = http_build_query($encodedRequestBody);
-
+            
             $curl = curl_init();
 
             curl_setopt_array($curl, array(
@@ -423,9 +441,12 @@ class PanicController extends Controller
             $response = curl_exec($curl);
             $decodedResponse = json_decode($response);
             curl_close($curl);
-            $timestamp = Settings::saveSegupTokenExpirationTimestamp();
-            $savedToken = Settings::saveSegupToken($decodedResponse->token);
-            return $savedToken->value;
+            if($decodedResponse && $decodedResponse->token) {
+                $timestamp = Settings::saveSegupTokenExpirationTimestamp();
+                $savedToken = Settings::saveSegupToken($decodedResponse->token);
+                return $savedToken->value;
+            }
+            return Settings::getSegupToken();
         } else {
             $savedToken = Settings::getSegupToken();
             return $savedToken;
@@ -443,6 +464,9 @@ class PanicController extends Controller
     public function callSegupApi($providerData, $requestData)
     {
         $token = $this->verifySegupToken();
+        if(!$token) {
+            return false;
+        }
         $url = Settings::getSegupRequestUrl();
         $createdRequestBody = PanicRepository::createSegupRequestBody($providerData, $requestData);
         $unencodedRequestBody = http_build_query($createdRequestBody);
@@ -493,5 +517,28 @@ class PanicController extends Controller
                 json_decode($request->filter)
             )
         ]);
+    }
+
+    /**
+     * Get all panic messages notification
+     * 
+     * @return Json
+     */
+    public function getPanicMessagesNotification(PanicRepository $message) 
+    {
+        return new MessagesPanicTodayResource($message->getAllMessagesPanicToday());
+    }
+
+    /**
+     * Set panic message to is seen and redirect to report panic messages
+     * @param PanicSeenFormRequest $request
+     * @return RedirectResponse
+     */
+    public function adminPanicSee(PanicSeenFormRequest $request)
+    {
+        $request->panic->setSeen();
+        event(new EventNewPanicMessageNotification());
+        return redirect()->route('libPanicReport');
+
     }
 }

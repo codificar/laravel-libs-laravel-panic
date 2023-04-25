@@ -60,4 +60,8 @@ return array(
 	'panic_id' => 'Id',
 	'history' => 'Mensagem',
 	'data' => 'Data/Horário',
+
+    "empty_chat" => "Empty messaging box!",
+    "show_all_panic_messages" => "See all panic messages",
+    "total" => "total"
 );
