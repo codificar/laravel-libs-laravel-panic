@@ -62,4 +62,8 @@ return array(
 	'history' => 'Mensagem',
 	'data' => 'Data/Horário',
 
+    "empty_chat" => "Caixa de mensagens vazia!",
+    "show_all_panic_messages" => "Ver todas mensagens de pânico",
+    "total" => "total"
+
 );
