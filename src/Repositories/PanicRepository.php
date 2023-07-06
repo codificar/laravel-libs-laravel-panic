@@ -723,8 +723,10 @@ class PanicRepository
             ])
             ->leftJoin('request as r', 'panic.request_id', '=', 'r.id')
             ->leftJoin('user as u', 'r.user_id', '=', 'u.id')
+            ->leftJoin('provider as p', 'r.confirmed_provider', '=', 'p.id')
             ->where(['panic.is_seen' => 0])
             ->whereNull('u.deleted_at')
+            ->whereNull('p.deleted_at')
             ->whereBetween('panic.created_at', [Carbon::today()->toDateTimeString(), Carbon::tomorrow()->toDateTimeString()])
             ->groupBy('id')
             ->orderBy('panic.created_at', 'desc');
