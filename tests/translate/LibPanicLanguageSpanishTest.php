@@ -19,7 +19,7 @@ class LibPanicLanguageSpanishTest extends TestCase
         
         $path = base_path() . '/vendor/codificar/panic/src/resources/lang';
         $directoryPt = "$path/pt-br/*.php";
-        $directoryEs = "$path/es/*.php";
+        $directoryEs = "$path/es-py/*.php";
         $filesPt = glob($directoryPt);
         $filesEs = glob($directoryEs);
 
