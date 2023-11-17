@@ -228,10 +228,11 @@ class PanicController extends Controller
         $adminMail = PanicRepository::setPanicAdminEmail($panicAdminEmail);
         $adminPhone = PanicRepository::setPanicAdminPhone($panicAdminPhone);
         $adminId = PanicRepository::setPanicAdminId($panicAdminId);
+        $panicAdminPhoneNumber = is_string($adminPhone) ? $adminPhone : $adminPhone->value;
 
         $panicAdminSettings = (object) array(
             'panic_admin_mail' => $adminMail->value,
-            'panic_admin_phone_number' => $adminPhone->value,
+            'panic_admin_phone_number' => $panicAdminPhoneNumber,
             'panic_admin_id' => $adminId->value,
         );
 
