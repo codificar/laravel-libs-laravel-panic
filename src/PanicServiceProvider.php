@@ -18,6 +18,11 @@ class PanicServiceProvider extends ServiceProvider
             __DIR__.'/../public/js' => public_path('vendor/codificar/panic'),
         ], 'public_vuejs_libs');
 
+        // Publish the tests files 
+        $this->publishes([
+            __DIR__ . '/../tests/' => base_path('tests/Unit/libs/panic'),
+        ], 'publishes_tests');
+
     }
     public function register()
     {

@@ -7,6 +7,7 @@ use Requests;
 use Settings;
 use User;
 use Admin;
+use Codificar\Panic\Models\Messages;
 use Ledger;
 use LedgerContact;
 use Provider;
@@ -28,7 +29,7 @@ class PanicRepository
      * @return object $insertedEntry
      */
     // change this function to the repository pattern
-    public static function insertPanicRequestToTable($requestId, $ledgerId, $adminId,  $fetchedData)
+    public static function insertPanicRequestToTable(int $requestId, int $ledgerId, int $adminId,  object $fetchedData): object 
     {
         $insertedEntry = new stdClass();
 
@@ -53,7 +54,7 @@ class PanicRepository
      * @param int $ledgerId
      * @return string 
      */
-    public function deletePanicRecordsFromTable(int $ledgerId)
+    public function deletePanicRecordsFromTable(int $ledgerId): string
     {
         $stringToReturn = "";
         try {
@@ -70,7 +71,7 @@ class PanicRepository
      * @param int $requestId
      * @return object $requestData
      */
-    public static function getRequestLocationData(int $requestId)
+    public static function getRequestLocationData(int $requestId): object
     {
         $requestLocationData = new stdClass();
         try {
@@ -93,7 +94,7 @@ class PanicRepository
      * @param int $ledgerId
      * @return object $partiesData
      */
-    public static function getPartiesData($requestId)
+    public static function getPartiesData($requestId): object
     {
         $partiesData = new stdClass();
         try {
@@ -108,14 +109,12 @@ class PanicRepository
         return $partiesData;
     }
 
-
-
     /**
      * This function provides a way to get the user data From The DB
      * @param int $userId
      * @return object $userData
      */
-    public static function getUserData($userId)
+    public static function getUserData(int $userId): object
     {
         $userData = new stdClass();
         try {
@@ -136,7 +135,7 @@ class PanicRepository
      * @param int $providerId
      * @return object providerData
      */
-    public static function getProviderData($providerId)
+    public static function getProviderData(int $providerId): object
     {
         $providerData = new stdClass();
         try {
@@ -163,7 +162,7 @@ class PanicRepository
      * @param int $ledgerId
      * @return object $ledgerContactUsers
      */
-    public static function getEmergencyContactsUserId($ledgerId)
+    public static function getEmergencyContactsUserId(int $ledgerId): object
     {
         $ledgerContactsUsers = new stdClass();
         try {
@@ -180,7 +179,7 @@ class PanicRepository
      * @param null
      * @return object $adminData
      */
-    public static function getAdminData()
+    public static function getAdminData(): object
     {
         try {
             $adminMail = Settings::getPanicAdminEmail();
@@ -216,7 +215,12 @@ class PanicRepository
      * @param int $ledgerId
      * @return string $panicHistory
      */
-    public static function createPanicHistory($userData, $providerData, $requestData, $requestId, $ledgerId)
+    public static function createPanicHistory(
+        object $userData, 
+        object $providerData, 
+        object $requestData, 
+        int $requestId, 
+        int $ledgerId): string
     {
         if (get_object_vars($userData)  && get_object_vars($providerData)  && get_object_vars($requestData)) {
 
@@ -243,7 +247,7 @@ class PanicRepository
      * @param int $requestId
      * @return object $fetchedPanicData
      */
-    public static function getPanicData($requestId)
+    public static function getPanicData(int $requestId): object
     {
         $partiesData = PanicRepository::getPartiesData($requestId);
 
@@ -269,7 +273,7 @@ class PanicRepository
      * @param object $requestData
      * @return array $panicRequestBody
      */
-    public static function createSegupRequestBody($providerData, $requestData)
+    public static function createSegupRequestBody(object $providerData, object $requestData): array
     {
         try {
             if ($requestData->bearing <= 0.0 || $requestData->bearing >= 360) {
@@ -301,7 +305,7 @@ class PanicRepository
      * @param float $bearing
      * @return string $direction
      */
-    public static function getDirectionFromBearing($bearing)
+    public static function getDirectionFromBearing(float $bearing): string
     {
         if ($bearing > 337.5 && $bearing < 360 || $bearing < 0 && $bearing > 22.5) {
             return "N";
@@ -336,7 +340,7 @@ class PanicRepository
      * @param null
      * @return object $panicUserButtonSetting
      */
-    public static function getPanicUserButtonSetting()
+    public static function getPanicUserButtonSetting(): object
     {
         try {
             $panicButtonUserSettings = Settings::getPanicButtonEnabledUser();
@@ -354,7 +358,7 @@ class PanicRepository
      * @param string $setting
      * @return object $panicProviderButtonSetting
      */
-    public static function setPanicUserButtonSetting($setting)
+    public static function setPanicUserButtonSetting(string $setting): object
     {
         try {
             $panicButtonUserSettings = Settings::savePanicButtonEnabledUser($setting);
@@ -369,7 +373,7 @@ class PanicRepository
      * @param null
      * @return object $panicProviderButtonSetting
      */
-    public static function getPanicProviderButtonSetting()
+    public static function getPanicProviderButtonSetting(): object
     {
         try {
             $panicButtonProviderSetting = Settings::getPanicButtonEnabledProvider();
@@ -538,7 +542,7 @@ class PanicRepository
      * @param string $adminPhone
      * @return string $adminPhone
      */
-    public static function setPanicAdminPhone($adminPhone)
+    public static function setPanicAdminPhone(string $adminPhone): string 
     {
         try {
             $adminPhone = Settings::savePanicAdminPhone($adminPhone);
@@ -552,7 +556,7 @@ class PanicRepository
      * This function fetches the admin phone from the settings table from the DB then returns the number
      * @return string $adminPhone
      */
-    public static function getPanicAdminPhone()
+    public static function getPanicAdminPhone(): string
     {
         $adminPhone = Settings::getPanicAdminPhone();
         if ($adminPhone != null) {
@@ -565,7 +569,7 @@ class PanicRepository
      * @param string $setting
      * @return object $admin_mail
      */
-    public static function setPanicAdminEmail(string $setting)
+    public static function setPanicAdminEmail(string $setting): object
     {
         try {
             $PanicAdminMail = Settings::savePanicAdminEmail($setting);
@@ -580,7 +584,7 @@ class PanicRepository
      * This function fetches the admin mail from the settings table from the DB then returns it
      * @return string $adminMail
      */
-    public static function getPanicAdminEmail()
+    public static function getPanicAdminEmail(): string
     {
         $adminPhone = Settings::getPanicAdminEmail();
         if ($adminPhone != null) {
@@ -591,7 +595,7 @@ class PanicRepository
     //TODO: change trans 
     /**
      * This function fetches the admin id from the settings table from the DB then returns it
-     * @return int $adminMail
+     * @return int|null $adminMail
      */
     public static function getPanicAdminId()
     {
@@ -603,8 +607,10 @@ class PanicRepository
 
     /**
      * This function sets a panic admin Id in the settings table then returns the value
+     * @param string $setting
+     * @return object
      */
-    public static function setPanicAdminId($setting)
+    public static function setPanicAdminId(string $setting): object
     {
         try {
             $PanicAdminId = Settings::savePanicAdminId($setting);
@@ -627,8 +633,8 @@ class PanicRepository
      */
     public static function search(
         $requestId = '',
-        $user_ledgerId = '',
-        $provider_ledgerId = ''
+        $userLedgerId = '',
+        $providerLedgerId = ''
     ) {
         $query = Panic::query();
         $query = $query->leftJoin(
@@ -648,11 +654,11 @@ class PanicRepository
         if ($requestId)
             $query = $query->where('r.id', $requestId);
 
-        if ($user_ledgerId)
-            $query = $query->where('l.id', $user_ledgerId);
+        if ($userLedgerId)
+            $query = $query->where('l.id', $userLedgerId);
 
-        if ($provider_ledgerId)
-            $query = $query->where('l.id', $provider_ledgerId);
+        if ($providerLedgerId)
+            $query = $query->where('l.id', $providerLedgerId);
 
 		return $query->select(
             'panic.id',
@@ -670,7 +676,7 @@ class PanicRepository
      * @param object $filter
      * @return array
      */
-    public static function fetch($page, $filter)
+    public static function fetch(int $page, object $filter): array
     {
         $recordsTotal = Panic::whereNotNull('id')->count();
 		
@@ -699,5 +705,52 @@ class PanicRepository
 			'records_filtered' => $data->count(),
 			'panic' => $data->paginate(10)
 		];
+    }
+
+    /**
+     * Get all messages panic todat
+     * @return array
+     */
+    public function getAllMessagesPanicToday(): array
+    {
+        $query = Panic::select(
+            [
+                'panic.id', 
+                \DB::raw('CONCAT(u.first_name, " ",  u.last_name) as username'), 
+                \DB::raw('date_format(panic.created_at, "%d/%m/%Y %h:%m:%s") AS datetime'), 
+                'panic.history as message',
+                'panic.request_id as request_id'
+            ])
+            ->leftJoin('request as r', 'panic.request_id', '=', 'r.id')
+            ->leftJoin('user as u', 'r.user_id', '=', 'u.id')
+            ->leftJoin('provider as p', 'r.confirmed_provider', '=', 'p.id')
+            ->where(['panic.is_seen' => 0])
+            ->whereNull('u.deleted_at')
+            ->whereNull('p.deleted_at')
+            ->whereBetween('panic.created_at', [Carbon::today()->toDateTimeString(), Carbon::tomorrow()->toDateTimeString()])
+            ->groupBy('id')
+            ->orderBy('panic.created_at', 'desc');
+        return array(
+            'total_unread' => $query->get()->count(),
+            'messages' => $query->limit(5)->get()
+        );
+    }
+
+    /**
+     * set al messages as read by conversation and/or user
+     * @param int $conversationId
+     * @param int $messageId
+     * @param int $userId - default null
+     * 
+     * @return void
+     */
+    public function setMessagesAsSeen(int $conversationId, int $messageId, int $userId = null): void
+    {
+        $messages = Messages::where('conversation_id', $conversationId)
+			->where('id', '<=', $messageId);
+        if($userId) {
+			$messages->where('user_id', '<>', $userId);
+        }
+			$messages->update(['is_seen' => true]);
     }
 };

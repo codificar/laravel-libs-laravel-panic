@@ -1,12 +1,17 @@
 <?php
 
 Route::group(['prefix' => '/lib/panic'], function () {
-    Route::get('/view/report', 'Codificar\Panic\Http\Controllers\PanicController@indexSorting');
+    Route::get('/view/report', 'Codificar\Panic\Http\Controllers\PanicController@indexSorting')->name('libPanicReport');
 	Route::get('/view/fetch', 'Codificar\Panic\Http\Controllers\PanicController@fetch');
 
     Route::get('/view/settings', function () {
         return view('laravel-panic::settings');
     });
+});
+
+Route::group(['prefix' => '/admin/lib/panic'], function() {
+    Route::get('/notification', 'Codificar\Panic\Http\Controllers\PanicController@getPanicMessagesNotification')->name('libAdminPanicMessagesNotifications');
+    Route::get('/see/{panicId}', 'Codificar\Panic\Http\Controllers\PanicController@adminPanicSee')->name('libPanicSee');
 });
 
 /**
