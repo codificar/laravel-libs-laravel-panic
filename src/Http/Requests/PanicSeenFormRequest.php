@@ -7,6 +7,7 @@ use Codificar\Panic\Models\Panic;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
+#[\AllowDynamicProperties]
 class PanicSeenFormRequest extends FormRequest
 {
 
