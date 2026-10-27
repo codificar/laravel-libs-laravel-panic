@@ -515,7 +515,7 @@ class PanicController extends Controller
         return new IndexResource([
             'panic' => PanicRepository::fetch(
                 $request->page,
-                json_decode($request->filter)
+                json_decode($request->filter ?? '')
             )
         ]);
     }
