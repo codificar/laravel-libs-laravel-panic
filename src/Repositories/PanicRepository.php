@@ -744,7 +744,7 @@ class PanicRepository
      * 
      * @return void
      */
-    public function setMessagesAsSeen(int $conversationId, int $messageId, int $userId = null): void
+    public function setMessagesAsSeen(int $conversationId, int $messageId, ?int $userId = null): void
     {
         $messages = Messages::where('conversation_id', $conversationId)
 			->where('id', '<=', $messageId);
